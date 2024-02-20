@@ -1,0 +1,22 @@
+<entryway> {
+    portrayal "the entryway of a haunted house"
+}
+
+<hallway> {
+    portrayal "a dimly lit hallway"
+}
+
+<kitchen> {
+    portrayal "the spooky kitchen"
+}
+<backyard> {
+    portrayal "the backyard! Congratulations, you won! Move anywhere to escape"
+}
+
+(adventurer) {
+    portrayal "You are an intrepid adventurer."
+    position entryway
+}
+
+start_position entryway
+final_position backyard

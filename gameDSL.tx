@@ -1,0 +1,81 @@
+GameWorld:
+    regions += Region
+    player = Player
+    'start_position' start_position = [Region]
+    'final_position' final_position = [Region]
+;
+
+Region:
+    '<' name = GWID '>' '{'
+        properties *= RegionProperties
+    '}'
+;
+
+Player:
+    '(' name = GWID ')' '{'
+        properties *= PlayerProperties
+    '}'
+;
+
+RegionProperties:
+    BasicProperties
+;
+
+
+PlayerProperties:
+    BasicProperties | MovementProperties | PositionProperties
+;
+
+BasicProperties:
+    PortrayalProperties
+;
+
+PortrayalProperties:
+    'portrayal' portrayal = STRING
+;
+
+PositionProperties:
+    'position' position = [Region]
+;
+
+MovementProperties:
+    MoveCommand | OpenCommand | TakeCommand | DropCommand | UseCommand
+;
+
+MoveCommand:
+    'move' direction = Direction
+;
+
+OpenCommand:
+    'open' object = GWID
+;
+
+TakeCommand:
+    'take' object = GWID
+;
+
+DropCommand:
+    'drop' object = GWID
+;
+
+UseCommand:
+    'use' object = GWID
+;
+
+
+Keyword:
+    'start_position' | 'final_position' | 'drop' | 'take' | 'open' | 'move' | 'N' | 'S' | 'E' | 'W' |
+    'portrayal' | 'position'
+;
+
+GWID:
+    !Keyword ID
+;
+
+Direction:
+    'N' | 'S' | 'E' | 'W'
+;
+
+Comment:
+    /\/\*(.|\n)*?\*\//
+;

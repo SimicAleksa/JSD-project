@@ -1,0 +1,77 @@
+
+    digraph textX {
+    fontname = "Bitstream Vera Sans"
+    fontsize = 8
+    node[
+        shape=record,
+        style=filled,
+        fillcolor=aliceblue
+    ]
+    nodesep = 0.3
+    edge[dir=black,arrowtail=empty]
+
+
+2341566002464[ label="{GameWorld|}"]
+
+2341566012064[ label="{Region|name: GWID\l}"]
+
+2341565988064[ label="{Player|name: GWID\l}"]
+
+2341566028384[ label="{*RegionProperties|}"]
+
+2341566021664[ label="{*PlayerProperties|}"]
+
+2341566014944[ label="{*BasicProperties|}"]
+
+2341566032224[ label="{PortrayalProperties|portrayal: STRING\l}"]
+
+2341566020704[ label="{PositionProperties|}"]
+
+2341566023584[ label="{*MovementProperties|}"]
+
+2341566035104[ label="{MoveCommand|direction: Direction\l}"]
+
+2341566027424[ label="{OpenCommand|object: GWID\l}"]
+
+2341566030304[ label="{TakeCommand|object: GWID\l}"]
+
+2341566033184[ label="{DropCommand|object: GWID\l}"]
+
+2341566041824[ label="{UseCommand|object: GWID\l}"]
+
+
+
+2341566002464 -> 2341566012064[arrowtail=diamond, dir=both, headlabel="regions 1..*"]
+2341566002464 -> 2341565988064[arrowtail=diamond, dir=both, headlabel="player "]
+2341566002464 -> 2341566012064[headlabel="start_position "]
+2341566002464 -> 2341566012064[headlabel="final_position "]
+2341566012064 -> 2341566028384[arrowtail=diamond, dir=both, headlabel="properties 0..*"]
+2341565988064 -> 2341566021664[arrowtail=diamond, dir=both, headlabel="properties 0..*"]
+2341566028384 -> 2341566032224 [dir=back]
+2341566021664 -> 2341566032224 [dir=back]
+2341566021664 -> 2341566023584 [dir=back]
+2341566021664 -> 2341566020704 [dir=back]
+2341566014944 -> 2341566032224 [dir=back]
+2341566020704 -> 2341566012064[headlabel="position "]
+2341566023584 -> 2341566035104 [dir=back]
+2341566023584 -> 2341566027424 [dir=back]
+2341566023584 -> 2341566030304 [dir=back]
+2341566023584 -> 2341566033184 [dir=back]
+2341566023584 -> 2341566041824 [dir=back]
+match_rules [ shape=plaintext, label=< <table>
+	<tr>
+		<td><b>Comment</b></td><td>\/\*(.|\n)*?\*\/</td>
+	</tr>
+	<tr>
+		<td><b>Direction</b></td><td>N|S|E|W</td>
+	</tr>
+	<tr>
+		<td><b>GWID</b></td><td>Not(Keyword) ID</td>
+	</tr>
+	<tr>
+		<td><b>Keyword</b></td><td>start_position|final_position|drop|take|open|move|N|S|E|W|portrayal|position</td>
+	</tr>
+</table> >]
+
+
+}
