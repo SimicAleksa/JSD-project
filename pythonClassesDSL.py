@@ -25,7 +25,7 @@ class Region:
         self.connections[direction] = target_region
 
     def print_self(self):
-        return f'You are in {self.properties["PortrayalProperties"]}. '
+        return f'You are in {self.properties["PortrayalProperties"]}'
 
 
 class Player:
@@ -43,11 +43,11 @@ class Player:
             for region in game_world.regions:
                 if region.name == target_room:
                     self.position = region
-            return "You moved to " + self.position.name,True
+            return self.name+" moved to " + self.position.name,True
         else:
-            return "You can't go that way.", False
+            return "You can't go that way", False
 
     # TODO - add other commands like take, use, drop ...
 
     def print_self(self):
-        return f'{self.position.print_self()}.'
+        return f'{self.position.print_self()}'

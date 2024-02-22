@@ -5,8 +5,12 @@ if __name__ == "__main__":
     gameWorld = parse_dsl()
 
     while True:
-        user_input = input(">>")
+        if gameWorld.player.position == gameWorld.final_position:
+            break
+
+        user_input = input(">>").strip()
 
         if user_input in DIRECTIONS:
-            text,moved = gameWorld.player.move(user_input[-1:],gameWorld)
+            text, moved = gameWorld.player.move(user_input[-1:], gameWorld)
             print(text)
+            print(gameWorld.player.print_self())

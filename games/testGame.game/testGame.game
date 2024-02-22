@@ -16,11 +16,14 @@
 <kitchen> {
     portrayal "the spooky kitchen"
     ::
+    N -> backyard,
+    S -> hallway
     ::
 }
 <backyard> {
-    portrayal "the backyard! Congratulations, you won! Move anywhere to escape"
+    portrayal "the backyard! Congratulations, you won!"
     ::
+    S -> kitchen
     ::
 }
 
