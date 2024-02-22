@@ -1,17 +1,46 @@
-from enums_consts import DIRECTIONS
+from enums_consts import DIRECTIONS, display_help
 from interpreter import parse_dsl
 
-if __name__ == "__main__":
-    gameWorld = parse_dsl()
-    print(gameWorld.player.print_self())
+global game_world
 
-    while True:
-        if gameWorld.player.position == gameWorld.final_position:
-            break
 
-        user_input = input(">>").strip()
-
-        if user_input in DIRECTIONS:
-            text, moved = gameWorld.player.move(user_input[-1:], gameWorld)
+def process_command(command, game_world):
+    commands_mapping = {
+        "move": game_world.player.move,
+        "take": game_world.player.take,
+        "drop": game_world.player.drop,
+        "use": game_world.player.use,
+        "open": game_world.player.open
+    }
+    try:
+        action, arg = command.split(" ", 1)
+        if action in commands_mapping:
+            if "move" in command:
+                if command in DIRECTIONS:
+                    text, moved = commands_mapping[action](arg, game_world)
+            else:
+                text = commands_mapping[action](arg, game_world)
             print(text)
-            print(gameWorld.player.print_self())
+            print(game_world.player.print_self())
+        else:
+            print("Invalid command")
+    except:
+        if command == "help":
+            display_help()
+        else:
+            print("Invalid command")
+
+
+def initial_setup():
+    global game_world
+    game_world = parse_dsl()
+    print("Enter 'help' for help")
+    print(game_world.player.print_self())
+
+
+if __name__ == "__main__":
+    initial_setup()
+
+    while game_world.player.position != game_world.final_position:
+        user_input = input(">>").strip()
+        process_command(user_input, game_world)
