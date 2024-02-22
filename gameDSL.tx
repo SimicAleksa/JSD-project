@@ -1,5 +1,6 @@
 GameWorld:
     regions += Region
+    items += Item
     player = Player
     'start_position' start_position = [Region]
     'final_position' final_position = [Region]
@@ -20,21 +21,48 @@ Player:
     '}'
 ;
 
+Item:
+    '[' name = GWID ']' '{'
+        properties *= ItemProperties
+        'isStatic' isStatic = BOOL
+    '}'
+;
+
+
 Connection:
     direction = Direction '->' target = GWID
 ;
 
 RegionProperties:
-    BasicProperties
+    BasicProperties | ContainsProperties
 ;
 
+ContainsProperties:
+    'contains' contains *= [Item][',']
+;
 
 PlayerProperties:
-    BasicProperties | MovementProperties | PositionProperties
+    BasicProperties | MovementProperties | PositionProperties | HealthProperties
 ;
 
 BasicProperties:
     PortrayalProperties
+;
+
+ItemProperties:
+    BasicProperties | ActivationProperties | ContainsProperties
+;
+
+ActivationProperties:
+    'activation' action = ActivationAction
+;
+
+ActivationAction:
+    HealAction
+;
+
+HealAction:
+    'heal' amount = INT
 ;
 
 PortrayalProperties:
@@ -43,6 +71,10 @@ PortrayalProperties:
 
 PositionProperties:
     'position' position = [Region]
+;
+
+HealthProperties:
+    'health' health = INT
 ;
 
 MovementProperties:
@@ -72,7 +104,7 @@ UseCommand:
 
 Keyword:
     'start_position' | 'final_position' | 'drop' | 'take' | 'open' | 'move' | 'N' | 'S' | 'E' | 'W' |
-    'portrayal' | 'position'
+    'portrayal' | 'position' | 'heal' | 'health' | 'contains'
 ;
 
 GWID:

@@ -7,6 +7,7 @@
 
 <hallway> {
     portrayal "a dimly lit hallway"
+    contains key, flashlight, chest
     ::
     N -> kitchen,
     S -> entryway
@@ -25,6 +26,33 @@
     ::
     S -> kitchen
     ::
+}
+
+
+[chest] {
+    portrayal "A wooden chest on the ground."
+    contains twix, mars
+    isStatic True
+}
+[twix] {
+    portrayal "A twix bar. Caramel, shortbread and chocolate delightfully restoring health."
+    activation heal 50
+    isStatic False
+}
+[mars] {
+    portrayal "A mars bar. Caramel and chocolate delightfully restoring health."
+    activation heal 700
+    isStatic False
+}
+
+[key] {
+    portrayal "A mysterious key lies on the ground."
+    isStatic False
+}
+[flashlight] {
+    portrayal "A flashlight lies on the ground."
+    activation heal 10
+    isStatic False
 }
 
 (adventurer) {

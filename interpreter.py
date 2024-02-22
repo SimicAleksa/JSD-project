@@ -1,7 +1,7 @@
 from textx import metamodel_from_file
 from os.path import join, dirname
 
-from pythonClassesDSL import GameWorld, Region, Player
+from pythonClassesDSL import GameWorld, Region, Player, Item, HealAction
 
 
 def parse_dsl():
@@ -20,7 +20,18 @@ def parse_dsl():
         properties(region, region_def)
         for connection in region_def.connections:
             region.add_connection(connection.direction, connection.target)
+        for prop in region_def.properties:
+            prop_name = prop.__class__.__name__
+            if prop_name == "ContainsProperties":
+                for item in prop.contains:
+                    region.items.append(item)
         game_world.regions.append(region)
+
+    # Create items
+    for item_def in model.items:
+        item = Item(item_def.name, item_def.isStatic)
+        properties(item, item_def)
+        game_world.items.append(item)
 
     # Create player
     player_def = model.player
@@ -50,7 +61,17 @@ def properties(obj, obj_def):
         prop_value = None
         if prop_name == "PortrayalProperties":
             prop_value = prop.portrayal
+        elif prop_name == "ContainsProperties":
+            prop_value = []
+            for item in prop.contains:
+                prop_value.append(item.name)
         elif prop_name == "PositionProperties":
             prop_value = prop.position.name
+        elif prop_name == "ActivationProperties":
+            action_name = prop.action.__class__.__name__
+            if action_name == "HealAction":
+                prop_value = HealAction(action_name, prop.action.amount)
+        elif prop_name == "HealthProperties":
+            prop_value = prop.health
 
         obj.add_property(prop_name, prop_value)

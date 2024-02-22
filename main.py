@@ -3,6 +3,7 @@ from interpreter import parse_dsl
 
 if __name__ == "__main__":
     gameWorld = parse_dsl()
+    print(gameWorld.player.print_self())
 
     while True:
         if gameWorld.player.position == gameWorld.final_position:
