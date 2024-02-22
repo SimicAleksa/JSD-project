@@ -57,6 +57,10 @@
 
 (adventurer) {
     portrayal "You are an intrepid adventurer."
+    health 100
+    inventory {
+        twix
+    }
     position entryway
 }
 

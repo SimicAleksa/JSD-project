@@ -13,7 +13,9 @@ POSSIBLE_COMMANDS = [
     "drop <item>",
     "open <item>",
     "take <item>",
-    "use <item>"
+    "use <item>",
+    "inventory",
+    "health"
 ]
 
 

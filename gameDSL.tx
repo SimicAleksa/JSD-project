@@ -42,11 +42,15 @@ ContainsProperties:
 ;
 
 PlayerProperties:
-    BasicProperties | MovementProperties | PositionProperties | HealthProperties
+    BasicProperties | MovementProperties | PositionProperties | HealthProperties | InventoryProperties
 ;
 
 BasicProperties:
     PortrayalProperties
+;
+
+InventoryProperties:
+    'inventory' '{' inventory *= [Item][','] '}'
 ;
 
 ItemProperties:
@@ -104,7 +108,7 @@ UseCommand:
 
 Keyword:
     'start_position' | 'final_position' | 'drop' | 'take' | 'open' | 'move' | 'N' | 'S' | 'E' | 'W' |
-    'portrayal' | 'position' | 'heal' | 'health' | 'contains'
+    'portrayal' | 'position' | 'heal' | 'health' | 'contains' | 'inventory' | 'isStatic'
 ;
 
 GWID:

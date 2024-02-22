@@ -36,13 +36,22 @@ def parse_dsl():
     # Create player
     player_def = model.player
     starting_position = None
+    health = 0
+    inventory = []
     for prop in player_def.properties:
         prop_name = prop.__class__.__name__
         if prop_name == "PositionProperties":
             for player_region in game_world.regions:
                 if prop.position.name == player_region.name:
                     starting_position = player_region
+        elif prop_name == "HealthProperties":
+            health = prop.health
+        elif prop_name == "InventoryProperties":
+            for item in prop.inventory:
+                inventory.append(item.name)
     player = Player(player_def.name, starting_position)
+    player.health = health
+    player.inventory = inventory
     properties(player, player_def)
     game_world.player = player
 
@@ -71,6 +80,10 @@ def properties(obj, obj_def):
             action_name = prop.action.__class__.__name__
             if action_name == "HealAction":
                 prop_value = HealAction(action_name, prop.action.amount)
+        elif prop_name == "InventoryProperties":
+            prop_value = []
+            for item in prop.inventory:
+                prop_value.append(item.name)
         elif prop_name == "HealthProperties":
             prop_value = prop.health
 

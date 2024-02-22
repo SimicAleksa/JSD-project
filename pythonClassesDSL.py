@@ -28,6 +28,12 @@ class Region:
             if item == region_item.name:
                 self.items.remove(region_item)
 
+    def is_item_contained(self, item):
+        for region_item in self.items:
+            if item == region_item.name:
+                return True
+        return False
+
     def add_connection(self, direction, target_region):
         self.connections[direction] = target_region
 
@@ -75,6 +81,13 @@ class Player:
             if item == region_item.name:
                 self.position.items.remove(region_item)
                 break
+
+    def heal(self, amount):
+        self.health += amount
+        if amount > 0:
+            return "You healed " + amount
+        else:
+            return "You took " + amount + " damage"
 
     def move(self, direction, game_world):
         if direction in self.position.connections:
@@ -139,7 +152,21 @@ class Player:
             return "You cant do that"
 
     def print_self(self):
-        return f'{self.position.print_self()}'
+        inventory = ""
+        for item in self.inventory:
+            inventory += item + ", "
+        inventory = inventory[:-2]
+        return f'{self.position.print_self()}Your backpack has {inventory}.'
+
+    def print_inventory(self):
+        inventory = ""
+        for item in self.inventory:
+            inventory += item + ", "
+        inventory = inventory[:-2]
+        return f'Your backpack has {inventory}.'
+
+    def print_health(self):
+        return f'You have {self.health} health.'
 
 
 class HealAction:

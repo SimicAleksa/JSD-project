@@ -4,13 +4,13 @@ from interpreter import parse_dsl
 global game_world
 
 
-def process_command(command, game_world):
+def process_command(command):
     commands_mapping = {
         "move": game_world.player.move,
         "take": game_world.player.take,
         "drop": game_world.player.drop,
         "use": game_world.player.use,
-        "open": game_world.player.open
+        "open": game_world.player.open,
     }
     try:
         action, arg = command.split(" ", 1)
@@ -27,6 +27,10 @@ def process_command(command, game_world):
     except:
         if command == "help":
             display_help()
+        elif command == "inventory":
+            print(game_world.player.print_inventory())
+        elif command == "health":
+            print(game_world.player.print_health())
         else:
             print("Invalid command")
 
@@ -43,4 +47,4 @@ if __name__ == "__main__":
 
     while game_world.player.position != game_world.final_position:
         user_input = input(">>").strip()
-        process_command(user_input, game_world)
+        process_command(user_input)
