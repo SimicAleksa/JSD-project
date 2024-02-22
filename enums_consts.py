@@ -1,0 +1,1 @@
+DIRECTIONS = ["move N", "move E", "move S", "move W"]

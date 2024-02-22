@@ -15,10 +15,14 @@ class GameWorld:
 class Region:
     def __init__(self, name):
         self.name = name
+        self.connections = {}
         self.properties = {}
 
     def add_property(self, prop_name, prop_value):
         self.properties[prop_name] = prop_value
+
+    def add_connection(self, direction, target_region):
+        self.connections[direction] = target_region
 
     def print_self(self):
         return f'You are in {self.properties["PortrayalProperties"]}. '
@@ -34,8 +38,8 @@ class Player:
         self.properties[prop_name] = prop_value
 
     def move(self, direction, game_world):
-        if direction in self.position.doors:
-            target_room = self.position.doors[direction]
+        if direction in self.position.connections:
+            target_room = self.position.connections[direction]
             for region in game_world.regions:
                 if region.name == target_room:
                     self.position = region

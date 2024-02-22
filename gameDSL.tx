@@ -8,6 +8,9 @@ GameWorld:
 Region:
     '<' name = GWID '>' '{'
         properties *= RegionProperties
+        '::'
+        connections *= Connection[',']
+        '::'
     '}'
 ;
 
@@ -15,6 +18,10 @@ Player:
     '(' name = GWID ')' '{'
         properties *= PlayerProperties
     '}'
+;
+
+Connection:
+    direction = Direction '->' target = GWID
 ;
 
 RegionProperties:

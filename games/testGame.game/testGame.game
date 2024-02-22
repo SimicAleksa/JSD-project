@@ -1,16 +1,27 @@
 <entryway> {
     portrayal "the entryway of a haunted house"
+    ::
+    N -> hallway
+    ::
 }
 
 <hallway> {
     portrayal "a dimly lit hallway"
+    ::
+    N -> kitchen,
+    S -> entryway
+    ::
 }
 
 <kitchen> {
     portrayal "the spooky kitchen"
+    ::
+    ::
 }
 <backyard> {
     portrayal "the backyard! Congratulations, you won! Move anywhere to escape"
+    ::
+    ::
 }
 
 (adventurer) {
