@@ -24,7 +24,8 @@ def process_command(command):
             print(game_world.player.print_self())
         else:
             print("Invalid command")
-    except:
+    except Exception as e:
+        print(e)
         if command == "help":
             display_help()
         elif command == "inventory":

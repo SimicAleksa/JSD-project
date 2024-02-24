@@ -3,6 +3,7 @@ GameWorld:
     items += Item
     player = Player
     enemies += Enemy
+    weapons += Weapon
     'start_position' start_position = [Region]
     'final_position' final_position = [Region]
 ;
@@ -28,13 +29,19 @@ Player:
     '}'
 ;
 
+Weapon:
+    '[[' name = GWID ']]' '{'
+        type = WeaponType
+        properties *= WeaponProperties
+    '}'
+;
+
 Item:
     '[' name = GWID ']' '{'
         properties *= ItemProperties
         'isStatic' isStatic = BOOL
     '}'
 ;
-
 
 Connection:
     direction = Direction '->' target = GWID
@@ -45,7 +52,11 @@ RegionProperties:
 ;
 
 ContainsProperties:
-    'contains' contains *= [Item][',']
+    'contains' contains *= [Containable][',']
+;
+
+Containable:
+    Item | Weapon
 ;
 
 EnemyProperties:
@@ -66,6 +77,10 @@ InventoryProperties:
 
 ItemProperties:
     BasicProperties | ActivationProperties | ContainsProperties
+;
+
+WeaponProperties:
+    'damage' amount = INT
 ;
 
 ActivationProperties:
@@ -120,10 +135,13 @@ UseCommand:
     'use' object = GWID
 ;
 
+WeaponType:
+    'primary' | 'secondary'
+;
 
 Keyword:
     'start_position' | 'final_position' | 'drop' | 'take' | 'open' | 'move' | 'N' | 'S' | 'E' | 'W' |
-    'portrayal' | 'position' | 'heal' | 'health' | 'contains' | 'inventory' | 'isStatic'
+    'portrayal' | 'position' | 'heal' | 'health' | 'contains' | 'inventory' | 'isStatic' | 'primary' | 'secondary'
 ;
 
 GWID:

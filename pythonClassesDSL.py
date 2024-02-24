@@ -3,8 +3,10 @@ class GameWorld:
         self.regions = []
         self.items = []
         self.enemies = []
+        self.weapons = {}
         self.player = None
         self.current_enemy = None
+        self.equipped_weapons = {}
         self.start_position = None
         self.final_position = None
 
@@ -84,6 +86,7 @@ class Player:
         self.inventory = []
         self.health = 100
         self.properties = {}
+        self.weapon = None
 
     def add_property(self, prop_name, prop_value):
         self.properties[prop_name] = prop_value
@@ -113,7 +116,7 @@ class Player:
                     self.position = region
                     text = f"{self.name} moved to {self.position.name}."
                     if game_world.check_combat(region):
-                        text += f"\nYou are in combat with {game_world.current_enemy.name}"
+                        text += f"\nYou encounter a {game_world.current_enemy.name}!"
                     return text, True
         else:
             return "You can't go that way", False
@@ -128,17 +131,38 @@ class Player:
                         return "You picked up " + game_world_item.name
                     else:
                         return "You cant do that"
+            if item in game_world.weapons:
+                self.replace_weapon(item, game_world)
+                return f"You picked up {item}. "
         else:
             return "That item is not present in this room"
+        
+    def replace_weapon(self, weapon, game_world):
+        self.inventory.append(weapon)
+        self.remove_item(weapon)
+        if self.weapon is not None:
+            self._drop_old_weapon(self.weapon, game_world)
+        self.weapon = weapon
 
     def drop(self, item, game_world):
         if item in self.inventory:
             self.inventory.remove(item)
-            for game_world_item in game_world.items:
-                if item == game_world_item.name:
-                    self.position.items.append(game_world_item)
-                    return "You dropped " + item + " in " + self.position.name
+            if item in [i.name for i in game_world.items]:
+                self.position.items.append(item)
+                return "You dropped " + item + " in " + self.position.name
         return "You dont have that item"
+    
+    def _drop_old_weapon(self, item, game_world):
+        if item in self.inventory:
+            self.inventory.remove(item)
+            if item in [i.name for i in game_world.items]:
+                self.position.items.append(item)
+                print("You dropped " + item + " in " + self.position.name)
+            elif item in game_world.weapons:
+                self.position.items.append(game_world.weapons[item])
+                print("You dropped " + item + " in " + self.position.name)
+        else:
+            print("You dont have that item")
 
     def use(self, item, game_world):
         if item in self.inventory:
@@ -230,6 +254,14 @@ class Enemy:
 
     def print_health(self):
         return f'{self.name} has {self.health} health.'
+
+
+
+class Weapon:
+    def __init__(self, name, type):
+        self.name = name
+        self.type = type
+        self.properties = {}
 
 
 class HealAction:
