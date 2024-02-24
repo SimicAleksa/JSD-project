@@ -64,5 +64,11 @@
     position entryway
 }
 
+((young_dragon)) {
+    portrayal "A young playful dragon looking for trouble."
+    health 60
+    position kitchen
+}
+
 start_position entryway
 final_position backyard

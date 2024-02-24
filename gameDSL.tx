@@ -2,6 +2,7 @@ GameWorld:
     regions += Region
     items += Item
     player = Player
+    enemies += Enemy
     'start_position' start_position = [Region]
     'final_position' final_position = [Region]
 ;
@@ -12,6 +13,12 @@ Region:
         '::'
         connections *= Connection[',']
         '::'
+    '}'
+;
+
+Enemy:
+    '((' name = GWID '))' '{'
+        properties *= EnemyProperties
     '}'
 ;
 
@@ -41,6 +48,10 @@ ContainsProperties:
     'contains' contains *= [Item][',']
 ;
 
+EnemyProperties:
+    BasicProperties | PositionProperties | HealthProperties | ActivationProperties | InventoryProperties
+;
+
 PlayerProperties:
     BasicProperties | MovementProperties | PositionProperties | HealthProperties | InventoryProperties
 ;
@@ -62,11 +73,15 @@ ActivationProperties:
 ;
 
 ActivationAction:
-    HealAction
+    HealAction | AttackAction
 ;
 
 HealAction:
     'heal' amount = INT
+;
+
+AttackAction:
+    'attack' amount = INT
 ;
 
 PortrayalProperties:

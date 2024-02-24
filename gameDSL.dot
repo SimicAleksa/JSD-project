@@ -11,53 +11,98 @@
     edge[dir=black,arrowtail=empty]
 
 
-2341566002464[ label="{GameWorld|}"]
+2099617610320[ label="{GameWorld|}"]
 
-2341566012064[ label="{Region|name: GWID\l}"]
+2099617500880[ label="{Region|name: GWID\l}"]
 
-2341565988064[ label="{Player|name: GWID\l}"]
+2099617514320[ label="{Enemy|name: GWID\l}"]
 
-2341566028384[ label="{*RegionProperties|}"]
+2099617509520[ label="{Player|name: GWID\l}"]
 
-2341566021664[ label="{*PlayerProperties|}"]
+2099617495120[ label="{Item|name: GWID\lisStatic: BOOL\l}"]
 
-2341566014944[ label="{*BasicProperties|}"]
+2099617498960[ label="{Connection|direction: Direction\ltarget: GWID\l}"]
 
-2341566032224[ label="{PortrayalProperties|portrayal: STRING\l}"]
+2099617499920[ label="{*RegionProperties|}"]
 
-2341566020704[ label="{PositionProperties|}"]
+2099617510480[ label="{ContainsProperties|}"]
 
-2341566023584[ label="{*MovementProperties|}"]
+2099617506640[ label="{*EnemyProperties|}"]
 
-2341566035104[ label="{MoveCommand|direction: Direction\l}"]
+2099617507600[ label="{*PlayerProperties|}"]
 
-2341566027424[ label="{OpenCommand|object: GWID\l}"]
+2099617493200[ label="{*BasicProperties|}"]
 
-2341566030304[ label="{TakeCommand|object: GWID\l}"]
+2099617516240[ label="{InventoryProperties|}"]
 
-2341566033184[ label="{DropCommand|object: GWID\l}"]
+2099617518160[ label="{*ItemProperties|}"]
 
-2341566041824[ label="{UseCommand|object: GWID\l}"]
+2099617522000[ label="{ActivationProperties|}"]
+
+2099617522960[ label="{*ActivationAction|}"]
+
+2099617492240[ label="{HealAction|amount: INT\l}"]
+
+2099617525840[ label="{AttackAction|amount: INT\l}"]
+
+2099617535440[ label="{PortrayalProperties|portrayal: STRING\l}"]
+
+2099617527760[ label="{PositionProperties|}"]
+
+2099617536400[ label="{HealthProperties|health: INT\l}"]
+
+2099617529680[ label="{*MovementProperties|}"]
+
+2099617531600[ label="{MoveCommand|direction: Direction\l}"]
+
+2099617533520[ label="{OpenCommand|object: GWID\l}"]
+
+2099617538320[ label="{TakeCommand|object: GWID\l}"]
+
+2099617540240[ label="{DropCommand|object: GWID\l}"]
+
+2099617542160[ label="{UseCommand|object: GWID\l}"]
 
 
 
-2341566002464 -> 2341566012064[arrowtail=diamond, dir=both, headlabel="regions 1..*"]
-2341566002464 -> 2341565988064[arrowtail=diamond, dir=both, headlabel="player "]
-2341566002464 -> 2341566012064[headlabel="start_position "]
-2341566002464 -> 2341566012064[headlabel="final_position "]
-2341566012064 -> 2341566028384[arrowtail=diamond, dir=both, headlabel="properties 0..*"]
-2341565988064 -> 2341566021664[arrowtail=diamond, dir=both, headlabel="properties 0..*"]
-2341566028384 -> 2341566032224 [dir=back]
-2341566021664 -> 2341566032224 [dir=back]
-2341566021664 -> 2341566023584 [dir=back]
-2341566021664 -> 2341566020704 [dir=back]
-2341566014944 -> 2341566032224 [dir=back]
-2341566020704 -> 2341566012064[headlabel="position "]
-2341566023584 -> 2341566035104 [dir=back]
-2341566023584 -> 2341566027424 [dir=back]
-2341566023584 -> 2341566030304 [dir=back]
-2341566023584 -> 2341566033184 [dir=back]
-2341566023584 -> 2341566041824 [dir=back]
+2099617610320 -> 2099617500880[arrowtail=diamond, dir=both, headlabel="regions 1..*"]
+2099617610320 -> 2099617495120[arrowtail=diamond, dir=both, headlabel="items 1..*"]
+2099617610320 -> 2099617514320[arrowtail=diamond, dir=both, headlabel="enemies 1..*"]
+2099617610320 -> 2099617509520[arrowtail=diamond, dir=both, headlabel="player "]
+2099617610320 -> 2099617500880[headlabel="start_position "]
+2099617610320 -> 2099617500880[headlabel="final_position "]
+2099617500880 -> 2099617499920[arrowtail=diamond, dir=both, headlabel="properties 0..*"]
+2099617500880 -> 2099617498960[arrowtail=diamond, dir=both, headlabel="connections 0..*"]
+2099617514320 -> 2099617506640[arrowtail=diamond, dir=both, headlabel="properties 0..*"]
+2099617509520 -> 2099617507600[arrowtail=diamond, dir=both, headlabel="properties 0..*"]
+2099617495120 -> 2099617518160[arrowtail=diamond, dir=both, headlabel="properties 0..*"]
+2099617499920 -> 2099617535440 [dir=back]
+2099617499920 -> 2099617510480 [dir=back]
+2099617510480 -> 2099617495120[headlabel="contains 0..*"]
+2099617506640 -> 2099617535440 [dir=back]
+2099617506640 -> 2099617527760 [dir=back]
+2099617506640 -> 2099617536400 [dir=back]
+2099617506640 -> 2099617522000 [dir=back]
+2099617506640 -> 2099617516240 [dir=back]
+2099617507600 -> 2099617535440 [dir=back]
+2099617507600 -> 2099617529680 [dir=back]
+2099617507600 -> 2099617527760 [dir=back]
+2099617507600 -> 2099617536400 [dir=back]
+2099617507600 -> 2099617516240 [dir=back]
+2099617493200 -> 2099617535440 [dir=back]
+2099617516240 -> 2099617495120[headlabel="inventory 0..*"]
+2099617518160 -> 2099617535440 [dir=back]
+2099617518160 -> 2099617522000 [dir=back]
+2099617518160 -> 2099617510480 [dir=back]
+2099617522000 -> 2099617522960[arrowtail=diamond, dir=both, headlabel="action "]
+2099617522960 -> 2099617492240 [dir=back]
+2099617522960 -> 2099617525840 [dir=back]
+2099617527760 -> 2099617500880[headlabel="position "]
+2099617529680 -> 2099617531600 [dir=back]
+2099617529680 -> 2099617533520 [dir=back]
+2099617529680 -> 2099617538320 [dir=back]
+2099617529680 -> 2099617540240 [dir=back]
+2099617529680 -> 2099617542160 [dir=back]
 match_rules [ shape=plaintext, label=< <table>
 	<tr>
 		<td><b>Comment</b></td><td>\/\*(.|\n)*?\*\/</td>
@@ -69,7 +114,7 @@ match_rules [ shape=plaintext, label=< <table>
 		<td><b>GWID</b></td><td>Not(Keyword) ID</td>
 	</tr>
 	<tr>
-		<td><b>Keyword</b></td><td>start_position|final_position|drop|take|open|move|N|S|E|W|portrayal|position</td>
+		<td><b>Keyword</b></td><td>start_position|final_position|drop|take|open|move|N|S|E|W|portrayal|position|heal|health|contains|inventory|isStatic</td>
 	</tr>
 </table> >]
 

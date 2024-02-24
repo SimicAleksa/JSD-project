@@ -1,7 +1,7 @@
 from textx import metamodel_from_file
 from os.path import join, dirname
 
-from pythonClassesDSL import GameWorld, Region, Player, Item, HealAction
+from pythonClassesDSL import GameWorld, Region, Player, Enemy, Item, HealAction
 
 
 def parse_dsl():
@@ -54,6 +54,15 @@ def parse_dsl():
     player.inventory = inventory
     properties(player, player_def)
     game_world.player = player
+    print(player.position)
+    print(player.properties)
+
+    #Create enemies
+    for enemy_def in model.enemies:
+        enemy = Enemy()
+        enemy.name = enemy_def.name
+        properties(enemy, enemy_def)
+        game_world.enemies.append(enemy)
 
     # Set start and final positions
     for player_region in game_world.regions:
