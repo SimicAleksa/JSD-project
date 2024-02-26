@@ -108,8 +108,8 @@ class Player:
                     if len(region.requirements) == 0:
                         self.position = region
                         return self.name + " moved to " + self.position.name, True
-                    elif set(region.requirements).issubset(self.inventory):
-                        self.inventory = [req for req in self.inventory if (req not in region.requirements)]
+                    elif _check_if_the_requirements_are_met(region.requirements, self.inventory):
+                        self.inventory = _remove_met_region_requirements_from_player_inventory(region.requirements,self.inventory)
                         region.requirements = []
                         self.position = region
                         return self.name + " moved to " + self.position.name, True
@@ -194,7 +194,7 @@ class HealAction:
         self.amount = amount
 
 
-def _check_if_the_requirements_are_met(self, region_requirements, player_inventory):
+def _check_if_the_requirements_are_met(region_requirements, player_inventory):
     for region_req in region_requirements:
         req_met = False
         for player_item in player_inventory:
@@ -204,3 +204,16 @@ def _check_if_the_requirements_are_met(self, region_requirements, player_invento
         if not req_met:
             return req_met
     return True
+
+
+def _remove_met_region_requirements_from_player_inventory(region_requirements, player_inventory):
+    ret_val = []
+    for player_item in player_inventory:
+        needed_req = False
+        for region_req in region_requirements:
+            if player_item == region_req.item:
+                needed_req = True
+                break
+        if not needed_req:
+            ret_val.append(player_item)
+    return ret_val
