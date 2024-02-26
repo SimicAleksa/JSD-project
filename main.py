@@ -24,18 +24,19 @@ def process_command(command):
                 text = commands_mapping[action](arg, game_world)
             print(text)
             print(game_world.player.print_self())
-            if game_world.current_enemy is not None:
-                game_world.do_combat()
         else:
             print("Invalid command")
     except Exception as e:
-        print(e)
         if command == "help":
             display_help()
         elif command == "inventory":
             print(game_world.player.print_inventory())
         elif command == "health":
             print(game_world.player.print_health())
+        elif command == "attack" and game_world.current_enemy is not None:
+            game_world.attack_enemy()
+        elif command == "flee":
+            game_world.flee()
         else:
             print("Invalid command")
 

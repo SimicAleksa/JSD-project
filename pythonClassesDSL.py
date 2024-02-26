@@ -27,38 +27,11 @@ class GameWorld:
     def set_final_position(self, region):
         self.final_position = region
 
-    def do_combat(self):
-        while self.current_enemy.get_health() > 0 and self.player.get_health() > 0:
-            print("Your turn")
-            valid_command = False
-            while not valid_command:
-                user_input = input(">>").strip()
-                if user_input == "attack":
-                    valid_command = True
-                    self.attack_enemy()
-                elif user_input == "flee":
-                    valid_command = True
-                    print("You fleed!")
-                    self.player.move(self.opposite_dirs[self.prev_direction], self)
-                    print(self.player.print_self())
-                    break
-                elif user_input.startswith("use"):
-                    try: 
-                        action, arg = user_input.split(" ", 1)
-                        if action == "use":
-                            valid_command = True
-                            text = self.player.use(arg, self)
-                            print(text)
-                    except:
-                        print("Invalid command")
-                else: 
-                    print("Invalid command")
-            print(f"{self.current_enemy.name}'s turn")
-            self.attack_player()
-        if (self.current_enemy.get_health() <= 0):
-            print(f"You beat {self.current_enemy.name}!")
-        else:
-            print("You died")
+    def flee(self):
+        print("You fleed!")
+        self.player.move(self.opposite_dirs[self.prev_direction], self)
+        print(self.player.print_self())
+        self.current_enemy = None
 
     def attack_enemy(self):
         damage = int(self.equipped_weapon.get_damage() * uniform(0.7, 1.3))
@@ -67,14 +40,25 @@ class GameWorld:
             enemy_health = 0
         self.current_enemy.set_health(enemy_health)
         print(f"You dealt {damage} damage. Enemy has {self.current_enemy.get_health()} health.")
+        if enemy_health == 0:
+            print(f"You beat {self.current_enemy.name}!")
+            self.current_enemy = None
+        else:
+            self.attack_player()
 
     def attack_player(self):
+        print(f"{self.current_enemy.name}'s turn")
         damage = int(self.current_enemy.get_damage() * uniform(0.7, 1.3))
         player_health = self.player.get_health() - damage
         if player_health < 0:
             player_health = 0
         self.player.set_health(player_health)
         print(f"{self.current_enemy.name} dealt {damage} damage. You have {self.player.get_health()} health.")
+        if player_health == 0:
+            print("You died")
+            self.player.move(self.opposite_dirs[self.prev_direction], self)
+            print(self.player.print_self())
+            self.current_enemy = None
 
 
 class Region:
@@ -168,6 +152,8 @@ class Player:
         self.health = value
 
     def move(self, direction, game_world):
+        if game_world.current_enemy is not None:
+            return "You shall not pass", False
         if direction in self.position.connections:
             target_room = self.position.connections[direction]
             for region in game_world.regions:
