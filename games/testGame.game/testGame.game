@@ -12,6 +12,7 @@
     N -> kitchen,
     S -> entryway
     ::
+    environmental_dmg damage 33
 }
 
 <kitchen> {

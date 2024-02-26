@@ -13,6 +13,7 @@ Region:
         connections *= Connection[',']
         '::'
         ('requirements' requirements += Requirement[','])?
+        ('environmental_dmg' environmental_dmg = EnvironmentalDamage)?
     '}'
 ;
 
@@ -74,6 +75,10 @@ HealAction:
     'heal' amount = INT
 ;
 
+EnvironmentalDamage:
+    'damage' amount = INT
+;
+
 PortrayalProperties:
     'portrayal' portrayal = STRING
 ;
@@ -113,7 +118,8 @@ UseCommand:
 
 Keyword:
     'start_position' | 'final_position' | 'drop' | 'take' | 'open' | 'move' | 'N' | 'S' | 'E' | 'W' |
-    'portrayal' | 'position' | 'heal' | 'health' | 'contains' | 'inventory' | 'isStatic' | 'requirements'
+    'portrayal' | 'position' | 'heal' | 'health' | 'contains' | 'inventory' | 'isStatic' | 'requirements' | 'damage' |
+    'environmental_dmg'
 ;
 
 GWID:

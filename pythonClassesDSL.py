@@ -20,9 +20,13 @@ class Region:
         self.connections = {}
         self.properties = {}
         self.requirements = []
+        self.environmental_dmg = 0
 
     def add_requirements(self, requirement):
         self.requirements.append(requirement)
+
+    def add_environmental_dmg(self, environmental_dmg):
+        self.environmental_dmg = environmental_dmg
 
     def add_property(self, prop_name, prop_value):
         self.properties[prop_name] = prop_value
@@ -107,14 +111,18 @@ class Player:
                 if region.name == target_room:
                     if len(region.requirements) == 0:
                         self.position = region
+                        self.health -= region.environmental_dmg.amount
+                        if region.environmental_dmg.amount != 0:
+                            return self.name + " moved to " + self.position.name, True
                         return self.name + " moved to " + self.position.name, True
                     elif _check_if_the_requirements_are_met(region.requirements, self.inventory):
                         self.inventory = _remove_met_region_requirements_from_player_inventory(region.requirements,self.inventory)
                         region.requirements = []
                         self.position = region
+                        self.health -= region.environmental_dmg
                         return self.name + " moved to " + self.position.name, True
                     else:
-                        return "Requirements not matched. You neeed a " + region.print_requirements(), False
+                        return "Requirements not matched. You need a " + region.print_requirements(), False
         else:
             return "You can't go that way", False
 
