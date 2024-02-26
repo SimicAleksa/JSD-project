@@ -82,5 +82,10 @@
     damage 20
 }
 
+*settings* {
+    dropOldWeapon False
+    additionalTurnAfterUse False
+}
+
 start_position entryway
 final_position backyard

@@ -4,8 +4,16 @@ GameWorld:
     player = Player
     enemies += Enemy
     weapons += Weapon
+    settings += GeneralSettings
     'start_position' start_position = [Region]
     'final_position' final_position = [Region]
+;
+
+GeneralSettings:
+    '*settings*' '{'
+        'dropOldWeapon' dropOldWeapon = BOOL?
+        'additionalTurnAfterUse' additionalTurnAfterUse = BOOL?
+    '}'
 ;
 
 Region:
@@ -20,6 +28,8 @@ Region:
 Enemy:
     '((' name = GWID '))' '{'
         properties *= EnemyProperties
+        itemsToDrop *= Item
+        weaponsToDrop *= Weapon
     '}'
 ;
 
@@ -42,6 +52,8 @@ Item:
         'isStatic' isStatic = BOOL
     '}'
 ;
+
+
 
 Connection:
     direction = Direction '->' target = GWID

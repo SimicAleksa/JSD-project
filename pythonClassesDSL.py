@@ -8,11 +8,11 @@ class GameWorld:
         self.weapons = {}
         self.player = None
         self.current_enemy = None
-        self.equipped_weapon = None
         self.start_position = None
         self.final_position = None
         self.prev_direction = None
         self.opposite_dirs = {"N": "S", "S": "N", "E": "W", "W": "E"}
+        self.settings = None
 
     def check_combat(self, region):
         for enemy in self.enemies:
@@ -34,7 +34,7 @@ class GameWorld:
         self.current_enemy = None
 
     def attack_enemy(self):
-        damage = int(self.equipped_weapon.get_damage() * uniform(0.7, 1.3))
+        damage = int(self.player.weapon.get_damage() * uniform(0.7, 1.3))
         enemy_health = self.current_enemy.get_health() - damage
         if enemy_health < 0:
             enemy_health = 0
@@ -44,21 +44,21 @@ class GameWorld:
             print(f"You beat {self.current_enemy.name}!")
             self.current_enemy = None
         else:
-            self.attack_player()
+            print(self.attack_player())
 
     def attack_player(self):
-        print(f"{self.current_enemy.name}'s turn")
+        # print(f"{self.current_enemy.name}'s turn")
         damage = int(self.current_enemy.get_damage() * uniform(0.7, 1.3))
         player_health = self.player.get_health() - damage
         if player_health < 0:
             player_health = 0
         self.player.set_health(player_health)
-        print(f"{self.current_enemy.name} dealt {damage} damage. You have {self.player.get_health()} health.")
+        text = f"{self.current_enemy.name}'s turn.\n{self.current_enemy.name} dealt {damage} damage. You have {self.player.get_health()} health."
         if player_health == 0:
-            print("You died")
+            text += "\nYou died"
             self.player.move(self.opposite_dirs[self.prev_direction], self)
-            print(self.player.print_self())
             self.current_enemy = None
+        return text
 
 
 class Region:
@@ -178,16 +178,16 @@ class Player:
                         return "You cant do that"
             if item in game_world.weapons:
                 self.take_weapon(item, game_world)
-                return f"You picked up {item}. "
+                return f"You picked up {item}. You equipped {item}. It deals additional {game_world.weapons[item].get_damage()} damage."
         else:
             return "That item is not present in this room"
         
     def take_weapon(self, weapon, game_world):
         self.inventory.append(weapon)
         self.remove_item(weapon)
-        # if self.weapon is not None:
-        #     self._drop_old_weapon(self.weapon, game_world)
-        self.weapon = weapon
+        if self.weapon is not None and game_world.settings.drop_old_weapon:
+            self._drop_old_weapon(self.weapon.name, game_world)
+        self.weapon = game_world.weapons[weapon]
 
     def drop(self, item, game_world):
         if item in self.inventory:
@@ -211,6 +211,7 @@ class Player:
 
     def use(self, item, game_world):
         if item in self.inventory:
+            text = ""
             for game_world_item in game_world.items:
                 if game_world_item.name == item:
                     if "ActivationProperties" in game_world_item.properties:
@@ -218,12 +219,15 @@ class Player:
                         if action.name == "HealAction":
                             self.inventory.remove(item)
                             self.health += action.amount
-                            return "You used " + item + ". Your health is now " + str(self.health)
+                            text = "You used " + item + ". Your health is now " + str(self.health)
                     else:
                         return "That item cant be used"
             if item in game_world.weapons:
-                game_world.equipped_weapon = game_world.weapons[item]
-                return f"You equipped {item}. It deals additional {game_world.weapons[item].get_damage()} damage."
+                self.weapon = game_world.weapons[item]
+                text = f"You equipped {item}. It deals additional {game_world.weapons[item].get_damage()} damage."
+            if game_world.current_enemy is not None and not game_world.settings.additional_turn_after_use:
+                text += "\n" + game_world.attack_player()
+            return text
         return f"You dont have that item {item}"
 
     def open(self, item, game_world):
@@ -334,3 +338,14 @@ class AttackAction:
     def __init__(self, name, amount):
         self.name = name
         self.amount = amount
+
+class GeneralSettings:
+    def __init__(self):
+        self.drop_old_weapon = False
+        self.additional_turn_after_use = False
+
+    def set_drop_old_weapon(self, value):
+        self.drop_old_weapon = value
+
+    def set_additional_turn_after_use(self, value):
+        self.additional_turn_after_use = value

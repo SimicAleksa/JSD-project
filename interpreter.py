@@ -1,7 +1,7 @@
 from textx import metamodel_from_file
 from os.path import join, dirname
 
-from pythonClassesDSL import GameWorld, Region, Player, Enemy, Item, HealAction, Weapon
+from pythonClassesDSL import GameWorld, Region, Player, Enemy, Item, HealAction, Weapon, GeneralSettings
 
 
 def parse_dsl():
@@ -74,8 +74,18 @@ def parse_dsl():
             game_world.set_start_position(player_region)
         elif player_region.name == model.final_position.name:
             game_world.set_final_position(player_region)
-    return game_world
 
+    # Set settings
+    for settings_def in model.settings:
+        settings = GeneralSettings()
+        if settings_def.additionalTurnAfterUse:
+            settings.set_additional_turn_after_use(True)
+        if settings_def.dropOldWeapon:
+            settings.set_drop_old_weapon(True)
+        game_world.settings = settings
+
+    return game_world
+        
 
 def properties(obj, obj_def):
     for prop in obj_def.properties:
