@@ -20,6 +20,7 @@
     N -> backyard,
     S -> hallway
     ::
+    requirements key
 }
 <backyard> {
     portrayal "the backyard! Congratulations, you won!"

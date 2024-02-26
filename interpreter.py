@@ -20,6 +20,8 @@ def parse_dsl():
         properties(region, region_def)
         for connection in region_def.connections:
             region.add_connection(connection.direction, connection.target)
+        if region_def.requirements:
+            region.add_requirements(region_def.requirements.item)
         for prop in region_def.properties:
             prop_name = prop.__class__.__name__
             if prop_name == "ContainsProperties":

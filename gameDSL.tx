@@ -12,7 +12,12 @@ Region:
         '::'
         connections *= Connection[',']
         '::'
+        ('requirements' requirements = Requirement)?
     '}'
+;
+
+Requirement:
+    item = GWID
 ;
 
 Player:
@@ -108,7 +113,7 @@ UseCommand:
 
 Keyword:
     'start_position' | 'final_position' | 'drop' | 'take' | 'open' | 'move' | 'N' | 'S' | 'E' | 'W' |
-    'portrayal' | 'position' | 'heal' | 'health' | 'contains' | 'inventory' | 'isStatic'
+    'portrayal' | 'position' | 'heal' | 'health' | 'contains' | 'inventory' | 'isStatic' | 'requirements'
 ;
 
 GWID:

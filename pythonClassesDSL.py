@@ -19,6 +19,10 @@ class Region:
         self.items = []
         self.connections = {}
         self.properties = {}
+        self.requirements = None
+
+    def add_requirements(self, requirement):
+        self.requirements = requirement
 
     def add_property(self, prop_name, prop_value):
         self.properties[prop_name] = prop_value
@@ -94,8 +98,16 @@ class Player:
             target_room = self.position.connections[direction]
             for region in game_world.regions:
                 if region.name == target_room:
-                    self.position = region
-            return self.name + " moved to " + self.position.name, True
+                    if region.requirements is None:
+                        self.position = region
+                        return self.name + " moved to " + self.position.name, True
+                    elif region.requirements in self.inventory:
+                        self.inventory.remove(region.requirements)
+                        region.requirements = None
+                        self.position = region
+                        return self.name + " moved to " + self.position.name, True
+                    else:
+                        return "Requirements not matched. You neeed a " + region.requirements, False
         else:
             return "You can't go that way", False
 
