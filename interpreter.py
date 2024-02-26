@@ -36,6 +36,7 @@ def parse_dsl():
     # Create weapons
     for weapon_def in model.weapons:
         weapon = Weapon(weapon_def.name, weapon_def.type)
+        properties(weapon, weapon_def)
         game_world.weapons[weapon_def.name] = weapon
 
     # Create player
@@ -98,5 +99,6 @@ def properties(obj, obj_def):
                 prop_value.append(item.name)
         elif prop_name == "HealthProperties":
             prop_value = prop.health
-
+        elif prop_name == "WeaponProperties":
+            prop_value = prop.damage
         obj.add_property(prop_name, prop_value)

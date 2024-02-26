@@ -132,16 +132,16 @@ class Player:
                     else:
                         return "You cant do that"
             if item in game_world.weapons:
-                self.replace_weapon(item, game_world)
+                self.take_weapon(item, game_world)
                 return f"You picked up {item}. "
         else:
             return "That item is not present in this room"
         
-    def replace_weapon(self, weapon, game_world):
+    def take_weapon(self, weapon, game_world):
         self.inventory.append(weapon)
         self.remove_item(weapon)
-        if self.weapon is not None:
-            self._drop_old_weapon(self.weapon, game_world)
+        # if self.weapon is not None:
+        #     self._drop_old_weapon(self.weapon, game_world)
         self.weapon = weapon
 
     def drop(self, item, game_world):
@@ -176,7 +176,10 @@ class Player:
                             return "You used " + item + ". Your health is now " + str(self.health)
                     else:
                         return "That item cant be used"
-        return "You dont have that item"
+            if item in game_world.weapons:
+                text = f"You equipped {item}. It deals additional {game_world.weapons[item].get_damage()} damage."
+                return text
+        return f"You dont have that item {item}"
 
     def open(self, item, game_world):
         if self.position.is_item_contained(item):
@@ -262,6 +265,12 @@ class Weapon:
         self.name = name
         self.type = type
         self.properties = {}
+
+    def get_damage(self):
+        return self.properties["WeaponProperties"]
+    
+    def add_property(self, prop_name, prop_value):
+        self.properties[prop_name] = prop_value
 
 
 class HealAction:

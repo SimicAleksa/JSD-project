@@ -80,7 +80,7 @@ ItemProperties:
 ;
 
 WeaponProperties:
-    'damage' amount = INT
+    'damage' damage = INT
 ;
 
 ActivationProperties:
