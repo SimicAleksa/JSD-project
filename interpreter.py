@@ -64,6 +64,8 @@ def parse_dsl():
     #Create enemies
     for enemy_def in model.enemies:
         enemy = Enemy()
+        # for item in enemy_def.itemsToDrop:
+        #     print(item)
         enemy.name = enemy_def.name
         properties(enemy, enemy_def)
         game_world.enemies.append(enemy)
@@ -111,4 +113,8 @@ def properties(obj, obj_def):
             prop_value = prop.health
         elif prop_name == "WeaponProperties":
             prop_value = prop.damage
+        elif prop_name == "ItemsToDrop" or prop_name == "WeaponsToDrop":
+            prop_value = {}
+            for item in prop.inventory:
+                prop_value[item.name] = item
         obj.add_property(prop_name, prop_value)

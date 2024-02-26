@@ -67,9 +67,16 @@
 
 ((young_dragon)) {
     portrayal "A young playful dragon looking for trouble."
-    health 60
+    health 30
     damage 15
     position kitchen
+    drops {
+        twix,
+        mars
+    }
+    dropsWeapon {
+        katana
+    }
 }
 
 [[katana]] {

@@ -42,12 +42,16 @@ class GameWorld:
         print(f"You dealt {damage} damage. Enemy has {self.current_enemy.get_health()} health.")
         if enemy_health == 0:
             print(f"You beat {self.current_enemy.name}!")
+            dropped_items = self.current_enemy.get_droppable()
+            for item in dropped_items:
+                self.player.position.items.append(item)
+            if len(dropped_items) > 0:
+                print(f"{self.current_enemy.name} dropped {', '.join([item.name for item in dropped_items])}")
             self.current_enemy = None
         else:
             print(self.attack_player())
 
     def attack_player(self):
-        # print(f"{self.current_enemy.name}'s turn")
         damage = int(self.current_enemy.get_damage() * uniform(0.7, 1.3))
         player_health = self.player.get_health() - damage
         if player_health < 0:
@@ -271,6 +275,8 @@ class Enemy:
         self.damage = 0
         self.reward_items = []
         self.properties = {}
+        self.items_to_drop = {}
+        self.weapons_to_drop = {}
 
     def get_position(self):
         return self.properties['PositionProperties']
@@ -289,6 +295,14 @@ class Enemy:
 
     def add_property(self, prop_name, prop_value):
         self.properties[prop_name] = prop_value
+
+    def get_droppable(self):
+        result = []
+        for i in self.properties['ItemsToDrop']:
+            result.append(self.properties['ItemsToDrop'][i])
+        for w in self.properties['WeaponsToDrop']:
+            result.append(self.properties['WeaponsToDrop'][w])
+        return result
     
     def attack(self, target):
         target.health -= self.damage

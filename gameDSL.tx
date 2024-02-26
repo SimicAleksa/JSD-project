@@ -28,8 +28,6 @@ Region:
 Enemy:
     '((' name = GWID '))' '{'
         properties *= EnemyProperties
-        itemsToDrop *= Item
-        weaponsToDrop *= Weapon
     '}'
 ;
 
@@ -72,7 +70,7 @@ Containable:
 ;
 
 EnemyProperties:
-    BasicProperties | PositionProperties | HealthProperties | ActivationProperties | InventoryProperties | WeaponProperties
+    BasicProperties | PositionProperties | HealthProperties | ActivationProperties | InventoryProperties | WeaponProperties | ItemsToDrop | WeaponsToDrop
 ;
 
 PlayerProperties:
@@ -113,6 +111,14 @@ AttackAction:
 
 PortrayalProperties:
     'portrayal' portrayal = STRING
+;
+
+ItemsToDrop:
+    'drops' '{' inventory *= [Item][','] '}'
+;
+
+WeaponsToDrop:
+    'dropsWeapon' '{' inventory *= [Weapon][','] '}'
 ;
 
 PositionProperties:
