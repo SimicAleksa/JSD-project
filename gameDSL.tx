@@ -60,7 +60,7 @@ Containable:
 ;
 
 EnemyProperties:
-    BasicProperties | PositionProperties | HealthProperties | ActivationProperties | InventoryProperties
+    BasicProperties | PositionProperties | HealthProperties | ActivationProperties | InventoryProperties | WeaponProperties
 ;
 
 PlayerProperties:

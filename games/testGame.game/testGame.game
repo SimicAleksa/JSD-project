@@ -68,6 +68,7 @@
 ((young_dragon)) {
     portrayal "A young playful dragon looking for trouble."
     health 60
+    damage 15
     position kitchen
 }
 

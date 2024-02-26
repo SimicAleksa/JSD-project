@@ -1,3 +1,5 @@
+from random import uniform
+
 class GameWorld:
     def __init__(self):
         self.regions = []
@@ -6,9 +8,11 @@ class GameWorld:
         self.weapons = {}
         self.player = None
         self.current_enemy = None
-        self.equipped_weapons = {}
+        self.equipped_weapon = None
         self.start_position = None
         self.final_position = None
+        self.prev_direction = None
+        self.opposite_dirs = {"N": "S", "S": "N", "E": "W", "W": "E"}
 
     def check_combat(self, region):
         for enemy in self.enemies:
@@ -22,6 +26,55 @@ class GameWorld:
 
     def set_final_position(self, region):
         self.final_position = region
+
+    def do_combat(self):
+        while self.current_enemy.get_health() > 0 and self.player.get_health() > 0:
+            print("Your turn")
+            valid_command = False
+            while not valid_command:
+                user_input = input(">>").strip()
+                if user_input == "attack":
+                    valid_command = True
+                    self.attack_enemy()
+                elif user_input == "flee":
+                    valid_command = True
+                    print("You fleed!")
+                    self.player.move(self.opposite_dirs[self.prev_direction], self)
+                    print(self.player.print_self())
+                    break
+                elif user_input.startswith("use"):
+                    try: 
+                        action, arg = user_input.split(" ", 1)
+                        if action == "use":
+                            valid_command = True
+                            text = self.player.use(arg, self)
+                            print(text)
+                    except:
+                        print("Invalid command")
+                else: 
+                    print("Invalid command")
+            print(f"{self.current_enemy.name}'s turn")
+            self.attack_player()
+        if (self.current_enemy.get_health() <= 0):
+            print(f"You beat {self.current_enemy.name}!")
+        else:
+            print("You died")
+
+    def attack_enemy(self):
+        damage = int(self.equipped_weapon.get_damage() * uniform(0.7, 1.3))
+        enemy_health = self.current_enemy.get_health() - damage
+        if enemy_health < 0:
+            enemy_health = 0
+        self.current_enemy.set_health(enemy_health)
+        print(f"You dealt {damage} damage. Enemy has {self.current_enemy.get_health()} health.")
+
+    def attack_player(self):
+        damage = int(self.current_enemy.get_damage() * uniform(0.7, 1.3))
+        player_health = self.player.get_health() - damage
+        if player_health < 0:
+            player_health = 0
+        self.player.set_health(player_health)
+        print(f"{self.current_enemy.name} dealt {damage} damage. You have {self.player.get_health()} health.")
 
 
 class Region:
@@ -107,6 +160,12 @@ class Player:
             return "You healed " + amount
         else:
             return "You took " + amount + " damage"
+        
+    def get_health(self):
+        return self.health
+    
+    def set_health(self, value):
+        self.health = value
 
     def move(self, direction, game_world):
         if direction in self.position.connections:
@@ -177,8 +236,8 @@ class Player:
                     else:
                         return "That item cant be used"
             if item in game_world.weapons:
-                text = f"You equipped {item}. It deals additional {game_world.weapons[item].get_damage()} damage."
-                return text
+                game_world.equipped_weapon = game_world.weapons[item]
+                return f"You equipped {item}. It deals additional {game_world.weapons[item].get_damage()} damage."
         return f"You dont have that item {item}"
 
     def open(self, item, game_world):
@@ -231,6 +290,12 @@ class Enemy:
 
     def get_health(self):
         return self.properties['HealthProperties']
+    
+    def set_health(self, value):
+        self.properties['HealthProperties'] = value
+
+    def get_damage(self):
+        return self.properties['WeaponProperties']
 
     def add_property(self, prop_name, prop_value):
         self.properties[prop_name] = prop_value

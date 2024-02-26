@@ -18,10 +18,14 @@ def process_command(command):
             if "move" in command:
                 if command in DIRECTIONS:
                     text, moved = commands_mapping[action](arg, game_world)
+                    if moved:
+                        game_world.prev_direction = arg
             else:
                 text = commands_mapping[action](arg, game_world)
             print(text)
             print(game_world.player.print_self())
+            if game_world.current_enemy is not None:
+                game_world.do_combat()
         else:
             print("Invalid command")
     except Exception as e:
