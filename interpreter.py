@@ -22,7 +22,7 @@ def parse_dsl():
             region.add_connection(connection.direction, connection.target)
         for requirement in region_def.requirements:
             region.add_requirements(requirement)
-        if region_def.environmental_dmg != 0:
+        if region_def.environmental_dmg:
             region.add_environmental_dmg(region_def.environmental_dmg)
         for prop in region_def.properties:
             prop_name = prop.__class__.__name__

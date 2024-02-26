@@ -20,7 +20,7 @@ class Region:
         self.connections = {}
         self.properties = {}
         self.requirements = []
-        self.environmental_dmg = 0
+        self.environmental_dmg = None
 
     def add_requirements(self, requirement):
         self.requirements.append(requirement)
@@ -110,21 +110,24 @@ class Player:
             for region in game_world.regions:
                 if region.name == target_room:
                     if len(region.requirements) == 0:
-                        self.position = region
-                        self.health -= region.environmental_dmg.amount
-                        if region.environmental_dmg.amount != 0:
-                            return self.name + " moved to " + self.position.name, True
-                        return self.name + " moved to " + self.position.name, True
+                        return self._change_player_position(region)
                     elif _check_if_the_requirements_are_met(region.requirements, self.inventory):
                         self.inventory = _remove_met_region_requirements_from_player_inventory(region.requirements,self.inventory)
                         region.requirements = []
-                        self.position = region
-                        self.health -= region.environmental_dmg
-                        return self.name + " moved to " + self.position.name, True
+                        return self._change_player_position(region)
                     else:
                         return "Requirements not matched. You need a " + region.print_requirements(), False
         else:
             return "You can't go that way", False
+
+    def _change_player_position(self, region):
+        self.position = region
+        if region.environmental_dmg:
+            self.health -= region.environmental_dmg.amount
+            if region.environmental_dmg.amount != 0:
+                return self.name + " moved to " + self.position.name + ". You took " + str(
+                    region.environmental_dmg.amount) + " environmental damage", True
+        return self.name + " moved to " + self.position.name, True
 
     def take(self, item, game_world):
         if self.position.is_item_contained(item):
