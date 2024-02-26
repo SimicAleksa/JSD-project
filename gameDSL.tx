@@ -12,7 +12,7 @@ Region:
         '::'
         connections *= Connection[',']
         '::'
-        ('requirements' requirements = Requirement)?
+        ('requirements' requirements += Requirement[','])?
     '}'
 ;
 

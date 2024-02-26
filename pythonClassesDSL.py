@@ -19,10 +19,10 @@ class Region:
         self.items = []
         self.connections = {}
         self.properties = {}
-        self.requirements = None
+        self.requirements = []
 
     def add_requirements(self, requirement):
-        self.requirements = requirement
+        self.requirements.append(requirement)
 
     def add_property(self, prop_name, prop_value):
         self.properties[prop_name] = prop_value
@@ -47,6 +47,13 @@ class Region:
             items += item.name + ", "
         items = items[:-2]
         return f'You are in {self.properties["PortrayalProperties"]}. Inside you see {items}. '
+
+    def print_requirements(self):
+        reqs = ""
+        for req in self.requirements:
+            reqs += str(req.item) + ", "
+        reqs = reqs[:-2]
+        return reqs
 
 
 class Item:
@@ -98,16 +105,16 @@ class Player:
             target_room = self.position.connections[direction]
             for region in game_world.regions:
                 if region.name == target_room:
-                    if region.requirements is None:
+                    if len(region.requirements) == 0:
                         self.position = region
                         return self.name + " moved to " + self.position.name, True
-                    elif region.requirements in self.inventory:
-                        self.inventory.remove(region.requirements)
-                        region.requirements = None
+                    elif set(region.requirements).issubset(self.inventory):
+                        self.inventory = [req for req in self.inventory if (req not in region.requirements)]
+                        region.requirements = []
                         self.position = region
                         return self.name + " moved to " + self.position.name, True
                     else:
-                        return "Requirements not matched. You neeed a " + region.requirements, False
+                        return "Requirements not matched. You neeed a " + region.print_requirements(), False
         else:
             return "You can't go that way", False
 
@@ -157,7 +164,7 @@ class Player:
                                 if temp_game_world_item.name == containItem:
                                     self.position.items.append(temp_game_world_item)
                         self.remove_item(item)
-                        return "You opened " + game_world_item.name+""
+                        return "You opened " + game_world_item.name + ""
                     else:
                         return "You cant do that"
         else:
@@ -185,3 +192,15 @@ class HealAction:
     def __init__(self, name, amount):
         self.name = name
         self.amount = amount
+
+
+def _check_if_the_requirements_are_met(self, region_requirements, player_inventory):
+    for region_req in region_requirements:
+        req_met = False
+        for player_item in player_inventory:
+            if player_item == region_req.item:
+                req_met = True
+                break
+        if not req_met:
+            return req_met
+    return True
