@@ -1,6 +1,5 @@
 <entryway> {
     portrayal "the entryway of a haunted house"
-    contains key, flashlight, chest
     ::
     N -> hallway
     ::
@@ -8,11 +7,11 @@
 
 <hallway> {
     portrayal "a dimly lit hallway"
+    contains key, flashlight, chest
     ::
     N -> kitchen,
     S -> entryway
     ::
-    requirements key,flashlight
 }
 
 <kitchen> {
@@ -21,6 +20,7 @@
     N -> backyard,
     S -> hallway
     ::
+    requirements key,flashlight
 }
 <backyard> {
     portrayal "the backyard! Congratulations, you won!"
