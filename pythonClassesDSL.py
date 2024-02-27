@@ -72,6 +72,14 @@ class Region:
         self.items = []
         self.connections = {}
         self.properties = {}
+        self.requirements = []
+        self.environmental_dmg = None
+
+    def add_requirements(self, requirement):
+        self.requirements.append(requirement)
+
+    def add_environmental_dmg(self, environmental_dmg):
+        self.environmental_dmg = environmental_dmg
 
     def add_property(self, prop_name, prop_value):
         self.properties[prop_name] = prop_value
@@ -99,6 +107,13 @@ class Region:
         if items:
             text += f"Inside you see {items}."
         return text
+
+    def print_requirements(self):
+        reqs = ""
+        for req in self.requirements:
+            reqs += str(req.item) + ", "
+        reqs = reqs[:-2]
+        return reqs
 
 
 class Item:
@@ -163,13 +178,27 @@ class Player:
             target_room = self.position.connections[direction]
             for region in game_world.regions:
                 if region.name == target_room:
-                    self.position = region
-                    text = f"{self.name} moved to {self.position.name}."
-                    if game_world.check_combat(region):
-                        text += f"\nYou encounter a {game_world.current_enemy.name}!"
-                    return text, True
+                    if len(region.requirements) == 0:
+                        return self._change_player_position(region, game_world)
+                    elif _check_if_the_requirements_are_met(region.requirements, self.inventory):
+                        self.inventory = _remove_met_region_requirements_from_player_inventory(region.requirements,self.inventory)
+                        region.requirements = []
+                        return self._change_player_position(region, game_world)
+                    else:
+                        return "Requirements not matched. You need a " + region.print_requirements(), False
         else:
             return "You can't go that way", False
+
+    def _change_player_position(self, region, game_world):
+        self.position = region
+        text = f"{self.name} moved to {self.position.name}."
+        if region.environmental_dmg:
+            self.health -= region.environmental_dmg.amount
+            if region.environmental_dmg.amount != 0:
+                text += f"\nYou took {region.environmental_dmg.amount} environmental damage"
+        if game_world.check_combat(region):
+            text += f"\nYou encounter a {game_world.current_enemy.name}!"
+        return text, True
 
     def take(self, item, game_world):
         if self.position.is_item_contained(item):
@@ -245,7 +274,7 @@ class Player:
                                 if temp_game_world_item.name == containItem:
                                     self.position.items.append(temp_game_world_item)
                         self.remove_item(item)
-                        return "You opened " + game_world_item.name+""
+                        return "You opened " + game_world_item.name + ""
                     else:
                         return "You cant do that"
         else:
@@ -351,7 +380,6 @@ class HealAction:
         self.name = name
         self.amount = amount
 
-
 class AttackAction:
     def __init__(self, name, amount):
         self.name = name
@@ -367,3 +395,28 @@ class GeneralSettings:
 
     def set_additional_turn_after_use(self, value):
         self.additional_turn_after_use = value
+
+
+def _check_if_the_requirements_are_met(region_requirements, player_inventory):
+    for region_req in region_requirements:
+        req_met = False
+        for player_item in player_inventory:
+            if player_item == region_req.item:
+                req_met = True
+                break
+        if not req_met:
+            return req_met
+    return True
+
+
+def _remove_met_region_requirements_from_player_inventory(region_requirements, player_inventory):
+    ret_val = []
+    for player_item in player_inventory:
+        needed_req = False
+        for region_req in region_requirements:
+            if player_item == region_req.item:
+                needed_req = True
+                break
+        if not needed_req:
+            ret_val.append(player_item)
+    return ret_val

@@ -1,6 +1,6 @@
 <entryway> {
     portrayal "the entryway of a haunted house"
-    contains magic_wand
+    contains key, flashlight, chest, magic_wand
     ::
     N -> hallway
     ::
@@ -13,6 +13,7 @@
     N -> kitchen,
     S -> entryway
     ::
+    environmental_dmg damage 33
 }
 
 <kitchen> {
@@ -21,6 +22,7 @@
     N -> backyard,
     S -> hallway
     ::
+    requirements key,flashlight
 }
 <backyard> {
     portrayal "the backyard! Congratulations, you won!"
