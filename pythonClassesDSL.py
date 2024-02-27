@@ -28,7 +28,7 @@ class GameWorld:
         self.final_position = region
 
     def flee(self):
-        print("You fleed!")
+        print("You fled!")
         self.current_enemy = None
         self.player.move(self.opposite_dirs[self.prev_direction], self)
         print(self.player.print_self())
