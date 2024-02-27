@@ -1,6 +1,6 @@
 <entryway> {
     portrayal "the entryway of a haunted house"
-    contains key, flashlight, chest
+    contains key, flashlight, chest, magic_wand
     ::
     N -> hallway
     ::
@@ -8,6 +8,7 @@
 
 <hallway> {
     portrayal "a dimly lit hallway"
+    contains key, flashlight, chest, katana
     ::
     N -> kitchen,
     S -> entryway
@@ -64,6 +65,35 @@
         twix
     }
     position entryway
+}
+
+((young_dragon)) {
+    portrayal "A young playful dragon looking for trouble."
+    health 30
+    damage 15
+    position kitchen
+    drops {
+        twix,
+        mars
+    }
+    dropsWeapon {
+        katana
+    }
+}
+
+[[katana]] {
+    primary
+    damage 10
+}
+
+[[magic_wand]] {
+    secondary
+    damage 20
+}
+
+*settings* {
+    dropOldWeapon False
+    additionalTurnAfterUse False
 }
 
 start_position entryway

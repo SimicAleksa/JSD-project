@@ -2,8 +2,18 @@ GameWorld:
     regions += Region
     items += Item
     player = Player
+    enemies += Enemy
+    weapons += Weapon
+    settings += GeneralSettings
     'start_position' start_position = [Region]
     'final_position' final_position = [Region]
+;
+
+GeneralSettings:
+    '*settings*' '{'
+        'dropOldWeapon' dropOldWeapon = BOOL?
+        'additionalTurnAfterUse' additionalTurnAfterUse = BOOL?
+    '}'
 ;
 
 Region:
@@ -17,6 +27,12 @@ Region:
     '}'
 ;
 
+Enemy:
+    '((' name = GWID '))' '{'
+        properties *= EnemyProperties
+    '}'
+;
+
 Requirement:
     item = GWID
 ;
@@ -24,6 +40,13 @@ Requirement:
 Player:
     '(' name = GWID ')' '{'
         properties *= PlayerProperties
+    '}'
+;
+
+Weapon:
+    '[[' name = GWID ']]' '{'
+        type = WeaponType
+        properties *= WeaponProperties
     '}'
 ;
 
@@ -35,6 +58,7 @@ Item:
 ;
 
 
+
 Connection:
     direction = Direction '->' target = GWID
 ;
@@ -44,7 +68,15 @@ RegionProperties:
 ;
 
 ContainsProperties:
-    'contains' contains *= [Item][',']
+    'contains' contains *= [Containable][',']
+;
+
+Containable:
+    Item | Weapon
+;
+
+EnemyProperties:
+    BasicProperties | PositionProperties | HealthProperties | ActivationProperties | InventoryProperties | WeaponProperties | ItemsToDrop | WeaponsToDrop
 ;
 
 PlayerProperties:
@@ -63,16 +95,24 @@ ItemProperties:
     BasicProperties | ActivationProperties | ContainsProperties
 ;
 
+WeaponProperties:
+    'damage' damage = INT
+;
+
 ActivationProperties:
     'activation' action = ActivationAction
 ;
 
 ActivationAction:
-    HealAction
+    HealAction | AttackAction
 ;
 
 HealAction:
     'heal' amount = INT
+;
+
+AttackAction:
+    'attack' amount = INT
 ;
 
 EnvironmentalDamage:
@@ -81,6 +121,14 @@ EnvironmentalDamage:
 
 PortrayalProperties:
     'portrayal' portrayal = STRING
+;
+
+ItemsToDrop:
+    'drops' '{' inventory *= [Item][','] '}'
+;
+
+WeaponsToDrop:
+    'dropsWeapon' '{' inventory *= [Weapon][','] '}'
 ;
 
 PositionProperties:
@@ -115,11 +163,14 @@ UseCommand:
     'use' object = GWID
 ;
 
+WeaponType:
+    'primary' | 'secondary'
+;
 
 Keyword:
     'start_position' | 'final_position' | 'drop' | 'take' | 'open' | 'move' | 'N' | 'S' | 'E' | 'W' |
-    'portrayal' | 'position' | 'heal' | 'health' | 'contains' | 'inventory' | 'isStatic' | 'requirements' | 'damage' |
-    'environmental_dmg'
+    'portrayal' | 'position' | 'heal' | 'health' | 'contains' | 'inventory' | 'isStatic' | 'primary' | 'secondary' |
+    'requirements' | 'damage' | 'environmental_dmg'
 ;
 
 GWID:

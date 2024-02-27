@@ -1,7 +1,7 @@
 from textx import metamodel_from_file
 from os.path import join, dirname
 
-from pythonClassesDSL import GameWorld, Region, Player, Item, HealAction
+from pythonClassesDSL import GameWorld, Region, Player, Enemy, Item, HealAction, Weapon, GeneralSettings
 
 
 def parse_dsl():
@@ -37,6 +37,12 @@ def parse_dsl():
         properties(item, item_def)
         game_world.items.append(item)
 
+    # Create weapons
+    for weapon_def in model.weapons:
+        weapon = Weapon(weapon_def.name, weapon_def.type)
+        properties(weapon, weapon_def)
+        game_world.weapons[weapon_def.name] = weapon
+
     # Create player
     player_def = model.player
     starting_position = None
@@ -59,14 +65,33 @@ def parse_dsl():
     properties(player, player_def)
     game_world.player = player
 
+    #Create enemies
+    for enemy_def in model.enemies:
+        enemy = Enemy()
+        # for item in enemy_def.itemsToDrop:
+        #     print(item)
+        enemy.name = enemy_def.name
+        properties(enemy, enemy_def)
+        game_world.enemies.append(enemy)
+
     # Set start and final positions
     for player_region in game_world.regions:
         if player_region.name == model.start_position.name:
             game_world.set_start_position(player_region)
         elif player_region.name == model.final_position.name:
             game_world.set_final_position(player_region)
-    return game_world
 
+    # Set settings
+    for settings_def in model.settings:
+        settings = GeneralSettings()
+        if settings_def.additionalTurnAfterUse:
+            settings.set_additional_turn_after_use(True)
+        if settings_def.dropOldWeapon:
+            settings.set_drop_old_weapon(True)
+        game_world.settings = settings
+
+    return game_world
+        
 
 def properties(obj, obj_def):
     for prop in obj_def.properties:
@@ -90,5 +115,10 @@ def properties(obj, obj_def):
                 prop_value.append(item.name)
         elif prop_name == "HealthProperties":
             prop_value = prop.health
-
+        elif prop_name == "WeaponProperties":
+            prop_value = prop.damage
+        elif prop_name == "ItemsToDrop" or prop_name == "WeaponsToDrop":
+            prop_value = {}
+            for item in prop.inventory:
+                prop_value[item.name] = item
         obj.add_property(prop_name, prop_value)
