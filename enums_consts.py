@@ -15,7 +15,9 @@ POSSIBLE_COMMANDS = [
     "take <item>",
     "use <item>",
     "inventory",
-    "health"
+    "health",
+    "attack",
+    "flee"
 ]
 
 
@@ -24,5 +26,3 @@ def display_help():
     for command in POSSIBLE_COMMANDS:
         help_string += command + "\n"
     print(help_string[:-1])
-
-

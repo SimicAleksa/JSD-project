@@ -29,9 +29,9 @@ class GameWorld:
 
     def flee(self):
         print("You fleed!")
+        self.current_enemy = None
         self.player.move(self.opposite_dirs[self.prev_direction], self)
         print(self.player.print_self())
-        self.current_enemy = None
 
     def attack_enemy(self):
         damage = int(self.player.weapon.get_damage() * uniform(0.7, 1.3))
@@ -42,6 +42,7 @@ class GameWorld:
         print(f"You dealt {damage} damage. Enemy has {self.current_enemy.get_health()} health.")
         if enemy_health == 0:
             print(f"You beat {self.current_enemy.name}!")
+            self.current_enemy.set_position_none()
             dropped_items = self.current_enemy.get_droppable()
             for item in dropped_items:
                 self.player.position.items.append(item)
@@ -280,6 +281,9 @@ class Enemy:
 
     def get_position(self):
         return self.properties['PositionProperties']
+    
+    def set_position_none(self):
+        self.properties['PositionProperties'] = None
     
     def get_description(self):
         return self.properties['PortrayalProperties']

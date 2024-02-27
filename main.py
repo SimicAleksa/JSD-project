@@ -27,7 +27,6 @@ def process_command(command):
         else:
             print("Invalid command")
     except Exception as e:
-        print(e)
         if command == "help":
             display_help()
         elif command == "inventory":
