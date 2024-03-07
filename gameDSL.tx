@@ -80,15 +80,7 @@ EnemyProperties:
 ;
 
 PlayerProperties:
-    BasicProperties | MovementProperties | PositionProperties | HealthProperties | InventoryProperties | AttributeProperties | LevelProperties
-;
-
-LevelProperties:
-    CurrentExpProperty | NeededExpProperty | LevelProperty
-;
-
-LevelProperty:
-    'level' level = INT
+    BasicProperties | MovementProperties | PositionProperties | HealthProperties | InventoryProperties | AttributeProperties
 ;
 
 AttributeProperties:
