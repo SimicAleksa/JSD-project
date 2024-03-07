@@ -48,6 +48,8 @@ def parse_dsl():
     starting_position = None
     health = 0
     inventory = []
+    vigor = 10
+    strength = 10
     for prop in player_def.properties:
         prop_name = prop.__class__.__name__
         if prop_name == "PositionProperties":
@@ -59,9 +61,17 @@ def parse_dsl():
         elif prop_name == "InventoryProperties":
             for item in prop.inventory:
                 inventory.append(item.name)
+        elif prop_name == "VigorAttribute":
+            vigor = prop.vigor
+        elif prop_name == "StrengthProperties":
+            strength = prop.strength
+
     player = Player(player_def.name, starting_position)
     player.health = health
     player.inventory = inventory
+    player.vigor = vigor
+    player.strength = strength
+
     properties(player, player_def)
     game_world.player = player
 
@@ -121,4 +131,10 @@ def properties(obj, obj_def):
             prop_value = {}
             for item in prop.inventory:
                 prop_value[item.name] = item
+        # elif prop_name == "AttributeProperties":
+        #     pass
+        elif prop_name == "VigorAttribute":
+            prop_value = prop.vigor
+        elif prop_name == "StrengthProperties":
+            prop_value = prop.strength
         obj.add_property(prop_name, prop_value)

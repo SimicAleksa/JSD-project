@@ -61,6 +61,8 @@
 (adventurer) {
     portrayal "You are an intrepid adventurer."
     health 100
+    vigor 10
+    strength 10
     inventory {
         twix
     }

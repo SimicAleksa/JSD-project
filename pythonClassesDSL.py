@@ -34,7 +34,7 @@ class GameWorld:
         print(self.player.print_self())
 
     def attack_enemy(self):
-        damage = int(self.player.weapon.get_damage() * uniform(0.7, 1.3))
+        damage = int(self.player.strike_damage() * uniform(0.7, 1.3))
         enemy_health = self.current_enemy.get_health() - damage
         if enemy_health < 0:
             enemy_health = 0
@@ -144,6 +144,8 @@ class Player:
         self.health = 100
         self.properties = {}
         self.weapon = None
+        self.vigor = 10
+        self.strength = 10
 
     def add_property(self, prop_name, prop_value):
         self.properties[prop_name] = prop_value
@@ -157,7 +159,24 @@ class Player:
     def attack(self, target):
         target.health -= 10
         return f"You hit you for {target.name} damage"
-    
+
+    def strike_damage(self):
+        if self.weapon is None:
+            return 10 * (self.strength / 10)
+        else:
+            damage = self.weapon.get_damage()
+            damage *= (1 + self.strength/100)
+            return damage
+
+    def inc_vigor(self):
+        self.vigor += 1
+        health = self.get_health()
+        health *= (1 + self.vigor/100)
+        self.set_health(health)
+
+    def inc_strength(self):
+        self.strength += 1
+
     def heal(self, amount):
         self.health += amount
         if amount > 0:

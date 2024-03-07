@@ -80,7 +80,19 @@ EnemyProperties:
 ;
 
 PlayerProperties:
-    BasicProperties | MovementProperties | PositionProperties | HealthProperties | InventoryProperties
+    BasicProperties | MovementProperties | PositionProperties | HealthProperties | InventoryProperties | AttributeProperties | LevelProperties
+;
+
+LevelProperties:
+    CurrentExpProperty | NeededExpProperty | LevelProperty
+;
+
+LevelProperty:
+    'level' level = INT
+;
+
+AttributeProperties:
+    VigorAttribute | StrengthAttribute
 ;
 
 BasicProperties:
@@ -137,6 +149,14 @@ PositionProperties:
 
 HealthProperties:
     'health' health = INT
+;
+
+VigorAttribute:
+    'vigor' vigor = INT
+;
+
+StrengthAttribute:
+    'strength' strength = INT
 ;
 
 MovementProperties:
