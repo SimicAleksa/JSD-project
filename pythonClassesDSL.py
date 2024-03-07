@@ -145,6 +145,7 @@ class Player:
         self.properties = {}
         self.weapon = None
         self.vigor = 10
+        self.endurance = 10
         self.strength = 10
 
     def add_property(self, prop_name, prop_value):
@@ -212,9 +213,12 @@ class Player:
         self.position = region
         text = f"{self.name} moved to {self.position.name}."
         if region.environmental_dmg:
-            self.health -= region.environmental_dmg.amount
+            environmental_dmg = region.environmental_dmg.amount - self.endurance
+            environmental_dmg = 0 if environmental_dmg < 0 else environmental_dmg
+            self.health -= environmental_dmg
             if region.environmental_dmg.amount != 0:
-                text += f"\nYou took {region.environmental_dmg.amount} environmental damage"
+                text += f"\nYou took {environmental_dmg} environmental damage"
+                text += f"\nYou now have {self.health} health"
         if game_world.check_combat(region):
             text += f"\nYou encounter a {game_world.current_enemy.name}!"
         return text, True

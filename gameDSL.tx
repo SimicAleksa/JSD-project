@@ -84,7 +84,7 @@ PlayerProperties:
 ;
 
 AttributeProperties:
-    VigorAttribute | StrengthAttribute
+    VigorAttribute | EnduranceAttribute | StrengthAttribute
 ;
 
 BasicProperties:
@@ -145,6 +145,10 @@ HealthProperties:
 
 VigorAttribute:
     'vigor' vigor = INT
+;
+
+EnduranceAttribute:
+    'endurance' endurance = INT
 ;
 
 StrengthAttribute:

@@ -63,6 +63,7 @@
     health 100
     vigor 10
     strength 10
+    endurance 10
     inventory {
         twix
     }
