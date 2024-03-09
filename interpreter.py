@@ -47,6 +47,9 @@ def parse_dsl():
     player_def = model.player
     starting_position = None
     health = 0
+    current_experiance = 0
+    needed_experiance_for_level_up = 100
+    level = 1
     inventory = []
     vigor = 10
     strength = 10
@@ -68,9 +71,17 @@ def parse_dsl():
             strength = prop.strength
         elif prop_name == "EnduranceAttribute":
             endurance = prop.endurance
-
+        elif prop_name == "CurrentExpProperty":
+            current_experiance = prop.currentExperiance
+        elif prop_name == "NeededExpProperty":
+            needed_experiance_for_level_up = prop.neededExperianceForLevelUp
+        elif prop_name == "LevelProperty":
+            level = prop.level
     player = Player(player_def.name, starting_position)
     player.health = health
+    player.current_experiance = current_experiance
+    player.needed_experiance_for_level_up = needed_experiance_for_level_up
+    player.level = level
     player.inventory = inventory
     player.vigor = vigor
     player.strength = strength

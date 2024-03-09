@@ -80,7 +80,7 @@ EnemyProperties:
 ;
 
 PlayerProperties:
-    BasicProperties | MovementProperties | PositionProperties | HealthProperties | InventoryProperties | AttributeProperties
+    BasicProperties | MovementProperties | PositionProperties | HealthProperties | InventoryProperties | AttributeProperties | LevelProperties
 ;
 
 AttributeProperties:
@@ -93,6 +93,22 @@ BasicProperties:
 
 InventoryProperties:
     'inventory' '{' inventory *= [Item][','] '}'
+;
+
+LevelProperties:
+    CurrentExpProperty | NeededExpProperty | LevelProperty
+;
+
+CurrentExpProperty:
+    'currentExperiance' currentExperiance = INT
+;
+
+NeededExpProperty:
+    'neededExperianceForLevelUp' neededExperianceForLevelUp = INT
+;
+
+LevelProperty:
+    'level' level = INT
 ;
 
 ItemProperties:

@@ -142,6 +142,9 @@ class Player:
         self.position = start_position
         self.inventory = []
         self.health = 100
+        self.current_experiance = 0
+        self.needed_experiance_for_level_up = 100
+        self.level = 1
         self.properties = {}
         self.weapon = None
         self.vigor = 10
