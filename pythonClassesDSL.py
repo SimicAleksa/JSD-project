@@ -178,6 +178,9 @@ class Player:
     def inc_strength(self):
         self.strength += 1
 
+    def inc_endurance(self):
+        self.endurance += 1
+
     def heal(self, amount):
         self.health += amount
         if amount > 0:
