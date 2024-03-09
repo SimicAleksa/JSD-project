@@ -64,8 +64,8 @@
     vigor 10
     strength 10
     endurance 10
-    currentExperiance 0
-    neededExperianceForLevelUp 200
+    currentExperiance 10
+    neededExperianceForLevelUp 20
     level 2
     inventory {
         twix

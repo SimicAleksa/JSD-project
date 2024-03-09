@@ -43,6 +43,7 @@ class GameWorld:
         if enemy_health == 0:
             print(f"You beat {self.current_enemy.name}!")
             self.current_enemy.set_position_none()
+            self.player.monster_slain()
             dropped_items = self.current_enemy.get_droppable()
             for item in dropped_items:
                 self.player.position.items.append(item)
@@ -183,6 +184,13 @@ class Player:
 
     def inc_endurance(self):
         self.endurance += 1
+        
+    def monster_slain(self):
+        self.current_experiance += 10
+        if self.current_experiance >= self.needed_experiance_for_level_up:
+            self.level += 1
+            self.current_experiance = 0
+            self.needed_experiance_for_level_up *= 1.1
 
     def heal(self, amount):
         self.health += amount
