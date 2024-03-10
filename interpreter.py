@@ -28,14 +28,14 @@ def parse_dsl():
             prop_name = prop.__class__.__name__
             if prop_name == "ContainsProperties":
                 for item in prop.contains:
-                    region.items.append(item)
+                    region.items[item.name] = item
         game_world.regions.append(region)
 
     # Create items
     for item_def in model.items:
         item = Item(item_def.name, item_def.isStatic)
         properties(item, item_def)
-        game_world.items.append(item)
+        game_world.items[item.name] = item
 
     # Create weapons
     for weapon_def in model.weapons:
@@ -79,6 +79,7 @@ def parse_dsl():
             level = prop.level
     player = Player(player_def.name, starting_position)
     player.health = health
+    player.initial_health = health
     player.current_experience = current_experience
     player.needed_experience_for_level_up = needed_experience_for_level_up
     player.level = level
@@ -93,8 +94,6 @@ def parse_dsl():
     # Create enemies
     for enemy_def in model.enemies:
         enemy = Enemy()
-        # for item in enemy_def.itemsToDrop:
-        #     print(item)
         enemy.name = enemy_def.name.replace("_", " ")
         properties(enemy, enemy_def)
         game_world.enemies.append(enemy)

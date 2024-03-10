@@ -4,7 +4,7 @@ from random import uniform
 class GameWorld:
     def __init__(self):
         self.regions = []
-        self.items = []
+        self.items = {}
         self.enemies = []
         self.weapons = {}
         self.player = None
@@ -47,7 +47,7 @@ class GameWorld:
             self.player.monster_slain(self.current_enemy)
             dropped_items = self.current_enemy.get_droppable()
             for item in dropped_items:
-                self.player.position.items.append(item)
+                self.player.position.items[item.name] = item
             if len(dropped_items) > 0:
                 print(f"{self.current_enemy.name} dropped {', '.join([item.name for item in dropped_items])}")
             self.current_enemy = None
@@ -63,8 +63,11 @@ class GameWorld:
         text = f"{self.current_enemy.name}'s turn.\n{self.current_enemy.name} dealt {damage} damage. You have {self.player.get_health()} health."
         if player_health == 0:
             text += "\nYou died"
+            dropped_items_text = self.player.drop_items_after_death(self)
             text_val, _ = self.player.move_to_start_position(self)
             text += f"\n{text_val}"
+            text += f"\n{dropped_items_text}"
+            self.current_enemy.reset_health()
             self.current_enemy = None
         return text
 
@@ -72,7 +75,7 @@ class GameWorld:
 class Region:
     def __init__(self, name):
         self.name = name
-        self.items = []
+        self.items = {}
         self.connections = {}
         self.properties = {}
         self.requirements = []
@@ -88,15 +91,10 @@ class Region:
         self.properties[prop_name] = prop_value
 
     def remove_item(self, item):
-        for region_item in self.items:
-            if item == region_item.name:
-                self.items.remove(region_item)
+        del self.items[item]
 
     def is_item_contained(self, item):
-        for region_item in self.items:
-            if item == region_item.name:
-                return True
-        return False
+        return item in self.items
 
     def add_connection(self, direction, target_region):
         self.connections[direction] = target_region
@@ -104,7 +102,7 @@ class Region:
     def print_self(self):
         items = ""
         for item in self.items:
-            items += item.name + ", "
+            items += item + ", "
         items = items[:-2]
         text = f"You are in {self.properties['PortrayalProperties']}. "
         if items:
@@ -145,6 +143,7 @@ class Player:
         self.position = start_position
         self.inventory = []
         self.health = 100
+        self.initial_health = 100
         self.current_experience = 0
         self.needed_experience_for_level_up = 100
         self.level = 1
@@ -159,10 +158,7 @@ class Player:
         self.properties[prop_name] = prop_value
 
     def remove_item(self, item):
-        for region_item in self.position.items:
-            if item == region_item.name:
-                self.position.items.remove(region_item)
-                break
+        del self.position.items[item]
 
     def attack(self, target):
         target.health -= 10
@@ -278,14 +274,14 @@ class Player:
 
     def take(self, item, game_world):
         if self.position.is_item_contained(item):
-            for game_world_item in game_world.items:
-                if item == game_world_item.name:
-                    if not game_world_item.isStatic:
-                        self.inventory.append(item)
-                        self.remove_item(item)
-                        return "You picked up " + game_world_item.name
-                    else:
-                        return "You cant do that"
+            if item in game_world.items:
+                game_world_item = game_world.items[item]
+                if not game_world_item.isStatic:
+                    self.inventory.append(item)
+                    self.remove_item(item)
+                    return "You picked up " + game_world_item.name
+                else:
+                    return "You cant do that"
             if item in game_world.weapons:
                 self.take_weapon(item, game_world)
                 return f"You picked up {item}. You equipped {item}. It deals additional {game_world.weapons[item].get_damage()} damage."
@@ -302,36 +298,52 @@ class Player:
     def drop(self, item, game_world):
         if item in self.inventory:
             self.inventory.remove(item)
-            if item in [i.name for i in game_world.items]:
-                self.position.items.append(item)
+            if item in game_world.items:
+                game_world_item = game_world.items[item]
+                self.position.items[item] = game_world_item
                 return "You dropped " + item + " in " + self.position.name
         return "You dont have that item"
+    
+
+    def drop_items_after_death(self, game_world):
+        direction = game_world.opposite_dirs[game_world.prev_direction]
+        target_room = self.position.connections[direction]
+        for region in game_world.regions:
+            if region.name == target_room:
+                for item in self.inventory:
+                    if item in game_world.items:
+                        region.items[item] = game_world.items[item]
+                    elif item in game_world.weapons:
+                       region.items[item] = game_world.weapons[item] 
+                self.inventory = []
+                self.weapon = None
+                self.current_experience = 0
+                self.health = self.initial_health
+                return f"Your posessions are in {region.name}"
+        return ""
+            
 
     def _drop_old_weapon(self, item, game_world):
-        if item in self.inventory:
+        if item in self.inventory and item in game_world.weapons:
+            self.position.items[item] = game_world.weapons[item]
             self.inventory.remove(item)
-            if item in [i.name for i in game_world.items]:
-                self.position.items.append(item)
-                print("You dropped " + item + " in " + self.position.name)
-            elif item in game_world.weapons:
-                self.position.items.append(game_world.weapons[item])
-                print("You dropped " + item + " in " + self.position.name)
+            print("You dropped " + item + " in " + self.position.name)
         else:
             print("You don't have that item")
 
     def use(self, item, game_world):
         if item in self.inventory:
             text = ""
-            for game_world_item in game_world.items:
-                if game_world_item.name == item:
-                    if "ActivationProperties" in game_world_item.properties:
-                        action = game_world_item.properties["ActivationProperties"]
-                        if action.name == "HealAction":
-                            self.inventory.remove(item)
-                            self.health += action.amount
-                            text = "You used " + item + ". Your health is now " + str(self.health)
-                    else:
-                        return "That item can't be used"
+            if item in game_world.items:
+                game_world_item = game_world.items[item]
+                if "ActivationProperties" in game_world_item.properties:
+                    action = game_world_item.properties["ActivationProperties"]
+                    if action.name == "HealAction":
+                        self.inventory.remove(item)
+                        self.health += action.amount
+                        text = "You used " + item + ". Your health is now " + str(self.health)
+                else:
+                    return "That item can't be used"
             if item in game_world.weapons:
                 self.weapon = game_world.weapons[item]
                 text = f"You equipped {item}. It deals additional {game_world.weapons[item].get_damage()} damage."
@@ -342,17 +354,17 @@ class Player:
 
     def open(self, item, game_world):
         if self.position.is_item_contained(item):
-            for game_world_item in game_world.items:
-                if item == game_world_item.name:
-                    if "ContainsProperties" in game_world_item.properties:
-                        for containItem in game_world_item.properties["ContainsProperties"]:
-                            for temp_game_world_item in game_world.items:
-                                if temp_game_world_item.name == containItem:
-                                    self.position.items.append(temp_game_world_item)
-                        self.remove_item(item)
-                        return "You opened " + game_world_item.name + ""
-                    else:
-                        return "You can't do that"
+            if item in game_world.items:
+                game_world_item = game_world.items[item]
+                if "ContainsProperties" in game_world_item.properties:
+                    for containItem in game_world_item.properties["ContainsProperties"]:
+                        for temp_game_world_item in game_world.items:
+                            if temp_game_world_item == containItem:
+                                self.position.items[temp_game_world_item] = game_world.items[temp_game_world_item]
+                    self.remove_item(item)
+                    return "You opened " + game_world_item.name + ""
+                else:
+                    return "You can't do that"
         else:
             return "You can't do that"
 
@@ -382,7 +394,7 @@ class Enemy:
     def __init__(self):
         self.name = ""
         self.position = ""  # Region object
-        self.health = 60
+        self.initial_health = 0
         self.damage = 0
         self.reward_items = []
         self.properties = {}
@@ -407,11 +419,16 @@ class Enemy:
     def set_health(self, value):
         self.properties['HealthProperties'] = value
 
+    def reset_health(self):
+        self.set_health(self.initial_health)        
+
     def get_damage(self):
         return self.properties['WeaponProperties']
 
     def add_property(self, prop_name, prop_value):
         self.properties[prop_name] = prop_value
+        if prop_name == 'HealthProperties':
+            self.initial_health = self.get_health()
 
     def get_droppable(self):
         result = []
@@ -425,10 +442,6 @@ class Enemy:
         target.health -= self.damage
         return f"{self.name} hits you for {self.damage} damage"
 
-    def heal(self, amount):
-        self.health += amount
-        return "{self} healed " + amount
-
     def drop(self, item, game_world):
         if item in self.reward_items:
             self.reward_items.remove(item)
@@ -440,9 +453,6 @@ class Enemy:
 
     def print_self(self):
         return f'There is an enemy: {self.name}.'
-
-    def print_health(self):
-        return f'{self.name} has {self.health} health.'
 
 
 class Weapon:
