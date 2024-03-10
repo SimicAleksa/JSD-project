@@ -75,8 +75,8 @@
 
 ((young_dragon)) {
     portrayal "A young playful dragon looking for trouble."
-    health 30
-    damage 15
+    health 1000
+    damage 40
     xp 50
     position kitchen
     drops {
