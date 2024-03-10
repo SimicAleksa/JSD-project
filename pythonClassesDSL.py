@@ -144,8 +144,8 @@ class Player:
         self.position = start_position
         self.inventory = []
         self.health = 100
-        self.current_experiance = 0
-        self.needed_experiance_for_level_up = 100
+        self.current_experience = 0
+        self.needed_experience_for_level_up = 100
         self.level = 1
         self.level_points = 0
         self.properties = {}
@@ -176,7 +176,7 @@ class Player:
             return damage
 
     def print_stats(self):
-        print(f"Current stats:\nVigor-{self.vigor}\nEndurance-{self.endurance}\nStrength-{self.strength}")
+        print(f"Current stats:\nVigor - {self.vigor}\nEndurance - {self.endurance}\nStrength - {self.strength}")
 
     def inc_stat(self, stat):
         if stat == "vigor":
@@ -216,13 +216,13 @@ class Player:
             return "You don't have enough level up points for this command!"
 
     def monster_slain(self, current_enemy):
-        self.current_experiance += current_enemy.get_xp_value()
-        if self.current_experiance >= self.needed_experiance_for_level_up:
-            while self.current_experiance >= self.needed_experiance_for_level_up:
-                self.current_experiance -= self.needed_experiance_for_level_up
+        self.current_experience += current_enemy.get_xp_value()
+        if self.current_experience >= self.needed_experience_for_level_up:
+            while self.current_experience >= self.needed_experience_for_level_up:
+                self.current_experience -= self.needed_experience_for_level_up
                 self.level += 1
                 self.level_points += 1
-                self.needed_experiance_for_level_up *= 1.1
+                self.needed_experience_for_level_up *= 1.1
                 print(f"You leveled up to: {self.level} level.")
             print(f"You have {self.level_points} points to use")
 
@@ -357,6 +357,8 @@ class Player:
         for item in self.inventory:
             inventory += item + ", "
         inventory = inventory[:-2]
+        if inventory == "":
+            return f'{self.position.print_self()}Your backpack is empty.'
         return f'{self.position.print_self()}Your backpack has {inventory}.'
 
     def print_inventory(self):
@@ -364,6 +366,8 @@ class Player:
         for item in self.inventory:
             inventory += item + ", "
         inventory = inventory[:-2]
+        if inventory == "":
+            return f'{self.position.print_self()}Your backpack is empty.'
         return f'Your backpack has {inventory}.'
 
     def print_health(self):

@@ -47,8 +47,8 @@ def parse_dsl():
     player_def = model.player
     starting_position = None
     health = 0
-    current_experiance = 0
-    needed_experiance_for_level_up = 100
+    current_experience = 0
+    needed_experience_for_level_up = 100
     level = 1
     inventory = []
     vigor = 10
@@ -72,15 +72,15 @@ def parse_dsl():
         elif prop_name == "EnduranceAttribute":
             endurance = prop.endurance
         elif prop_name == "CurrentExpProperty":
-            current_experiance = prop.currentExperiance
+            current_experience = prop.currentExperience
         elif prop_name == "NeededExpProperty":
-            needed_experiance_for_level_up = prop.neededExperianceForLevelUp
+            needed_experience_for_level_up = prop.neededExperienceForLevelUp
         elif prop_name == "LevelProperty":
             level = prop.level
     player = Player(player_def.name, starting_position)
     player.health = health
-    player.current_experiance = current_experiance
-    player.needed_experiance_for_level_up = needed_experiance_for_level_up
+    player.current_experience = current_experience
+    player.needed_experience_for_level_up = needed_experience_for_level_up
     player.level = level
     player.inventory = inventory
     player.vigor = vigor
@@ -90,12 +90,12 @@ def parse_dsl():
     properties(player, player_def)
     game_world.player = player
 
-    #Create enemies
+    # Create enemies
     for enemy_def in model.enemies:
         enemy = Enemy()
         # for item in enemy_def.itemsToDrop:
         #     print(item)
-        enemy.name = enemy_def.name
+        enemy.name = enemy_def.name.replace("_", " ")
         properties(enemy, enemy_def)
         game_world.enemies.append(enemy)
 
@@ -116,7 +116,7 @@ def parse_dsl():
         game_world.settings = settings
 
     return game_world
-        
+
 
 def properties(obj, obj_def):
     for prop in obj_def.properties:

@@ -99,11 +99,11 @@ LevelProperties:
 ;
 
 CurrentExpProperty:
-    'currentExperiance' currentExperiance = INT
+    'currentExperience' currentExperience = INT
 ;
 
 NeededExpProperty:
-    'neededExperianceForLevelUp' neededExperianceForLevelUp = INT
+    'neededExperienceForLevelUp' neededExperienceForLevelUp = INT
 ;
 
 LevelProperty:
@@ -201,8 +201,8 @@ UseCommand:
 Keyword:
     'start_position' | 'final_position' | 'drop' | 'take' | 'open' | 'move' | 'N' | 'S' | 'E' | 'W' |
     'portrayal' | 'position' | 'heal' | 'health' | 'contains' | 'inventory' | 'isStatic' |
-    'requirements' | 'damage' | 'environmental_dmg' | 'xp' | 'vigor' | 'endurance' | 'strength' | 'currentExperiance' |
-    'neededExperianceForLevelUp' | 'dropsWeapon' | 'level'
+    'requirements' | 'damage' | 'environmental_dmg' | 'xp' | 'vigor' | 'endurance' | 'strength' | 'currentExperience' |
+    'neededExperienceForLevelUp' | 'dropsWeapon' | 'level'
 ;
 
 GWID:
