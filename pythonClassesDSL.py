@@ -63,7 +63,8 @@ class GameWorld:
         text = f"{self.current_enemy.name}'s turn.\n{self.current_enemy.name} dealt {damage} damage. You have {self.player.get_health()} health."
         if player_health == 0:
             text += "\nYou died"
-            self.player.move(self.opposite_dirs[self.prev_direction], self)
+            text_val, _ = self.player.move_to_start_position(self)
+            text += f"\n{text_val}"
             self.current_enemy = None
         return text
 
@@ -107,7 +108,7 @@ class Region:
         items = items[:-2]
         text = f"You are in {self.properties['PortrayalProperties']}. "
         if items:
-            text += f"Inside you see {items}."
+            text += f"Inside you see {items}. "
         return text
 
     def print_requirements(self):
@@ -257,6 +258,9 @@ class Player:
                         return "Requirements not matched. You need a " + region.print_requirements(), False
         else:
             return "You can't go that way", False
+        
+    def move_to_start_position(self, game_world):
+        return self._change_player_position(game_world.start_position, game_world)
 
     def _change_player_position(self, region, game_world):
         self.position = region
@@ -313,7 +317,7 @@ class Player:
                 self.position.items.append(game_world.weapons[item])
                 print("You dropped " + item + " in " + self.position.name)
         else:
-            print("You dont have that item")
+            print("You don't have that item")
 
     def use(self, item, game_world):
         if item in self.inventory:
@@ -327,14 +331,14 @@ class Player:
                             self.health += action.amount
                             text = "You used " + item + ". Your health is now " + str(self.health)
                     else:
-                        return "That item cant be used"
+                        return "That item can't be used"
             if item in game_world.weapons:
                 self.weapon = game_world.weapons[item]
                 text = f"You equipped {item}. It deals additional {game_world.weapons[item].get_damage()} damage."
             if game_world.current_enemy is not None and not game_world.settings.additional_turn_after_use:
                 text += "\n" + game_world.attack_player()
             return text
-        return f"You dont have that item {item}"
+        return f"You don't have that item {item}"
 
     def open(self, item, game_world):
         if self.position.is_item_contained(item):
@@ -348,9 +352,9 @@ class Player:
                         self.remove_item(item)
                         return "You opened " + game_world_item.name + ""
                     else:
-                        return "You cant do that"
+                        return "You can't do that"
         else:
-            return "You cant do that"
+            return "You can't do that"
 
     def print_self(self):
         inventory = ""
