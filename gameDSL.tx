@@ -45,7 +45,6 @@ Player:
 
 Weapon:
     '[[' name = GWID ']]' '{'
-        type = WeaponType
         properties *= WeaponProperties
     '}'
 ;
@@ -76,7 +75,7 @@ Containable:
 ;
 
 EnemyProperties:
-    BasicProperties | PositionProperties | HealthProperties | ActivationProperties | InventoryProperties | WeaponProperties | ItemsToDrop | WeaponsToDrop
+    BasicProperties | PositionProperties | HealthProperties | ActivationProperties | InventoryProperties | WeaponProperties | ItemsToDrop | WeaponsToDrop | Experience
 ;
 
 PlayerProperties:
@@ -109,6 +108,10 @@ NeededExpProperty:
 
 LevelProperty:
     'level' level = INT
+;
+
+Experience:
+    'xp' xp = INT
 ;
 
 ItemProperties:
@@ -195,14 +198,11 @@ UseCommand:
     'use' object = GWID
 ;
 
-WeaponType:
-    'primary' | 'secondary'
-;
-
 Keyword:
     'start_position' | 'final_position' | 'drop' | 'take' | 'open' | 'move' | 'N' | 'S' | 'E' | 'W' |
-    'portrayal' | 'position' | 'heal' | 'health' | 'contains' | 'inventory' | 'isStatic' | 'primary' | 'secondary' |
-    'requirements' | 'damage' | 'environmental_dmg'
+    'portrayal' | 'position' | 'heal' | 'health' | 'contains' | 'inventory' | 'isStatic' |
+    'requirements' | 'damage' | 'environmental_dmg' | 'xp' | 'vigor' | 'endurance' | 'strength' | 'currentExperiance' |
+    'neededExperianceForLevelUp' | 'dropsWeapon' | 'level'
 ;
 
 GWID:

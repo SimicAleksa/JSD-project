@@ -11,6 +11,7 @@ def process_command(command):
         "drop": game_world.player.drop,
         "use": game_world.player.use,
         "open": game_world.player.open,
+        "inc": game_world.player.inc_stat,
     }
     try:
         action, arg = command.split(" ", 1)
@@ -20,6 +21,8 @@ def process_command(command):
                     text, moved = commands_mapping[action](arg, game_world)
                     if moved:
                         game_world.prev_direction = arg
+            elif "inc" in command:
+                text = commands_mapping[action](arg)
             else:
                 text = commands_mapping[action](arg, game_world)
             print(text)
@@ -37,12 +40,8 @@ def process_command(command):
             game_world.attack_enemy()
         elif command == "flee":
             game_world.flee()
-        elif command == "inc vigor":
-            game_world.player.inc_vigor()
-        elif command == "inc endurance":
-            game_world.player.inc_endurance()
-        elif command == "inc strength":
-            game_world.player.inc_strength()
+        elif command == "stats":
+            game_world.player.print_stats()
         else:
             print("Invalid command")
 

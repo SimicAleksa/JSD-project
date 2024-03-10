@@ -77,6 +77,7 @@
     portrayal "A young playful dragon looking for trouble."
     health 30
     damage 15
+    xp 50
     position kitchen
     drops {
         twix,
@@ -88,12 +89,10 @@
 }
 
 [[katana]] {
-    primary
     damage 10
 }
 
 [[magic_wand]] {
-    secondary
     damage 20
 }
 

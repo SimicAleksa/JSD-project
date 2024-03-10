@@ -39,7 +39,7 @@ def parse_dsl():
 
     # Create weapons
     for weapon_def in model.weapons:
-        weapon = Weapon(weapon_def.name, weapon_def.type)
+        weapon = Weapon(weapon_def.name)
         properties(weapon, weapon_def)
         game_world.weapons[weapon_def.name] = weapon
 
@@ -154,4 +154,6 @@ def properties(obj, obj_def):
             prop_value = prop.strength
         elif prop_name == "EnduranceAttribute":
             prop_value = prop.endurance
+        elif prop_name == "Experience":
+            prop_value = prop.xp
         obj.add_property(prop_name, prop_value)
