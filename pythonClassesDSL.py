@@ -146,6 +146,7 @@ class Player:
         self.current_experiance = 0
         self.needed_experiance_for_level_up = 100
         self.level = 1
+        self.level_points = 0
         self.properties = {}
         self.weapon = None
         self.vigor = 10
@@ -174,21 +175,34 @@ class Player:
             return damage
 
     def inc_vigor(self):
-        self.vigor += 1
-        health = self.get_health()
-        health *= (1 + self.vigor/100)
-        self.set_health(health)
+        if self.level_points >= 1:
+            self.vigor += 1
+            self.level_points -= 1
+            health = self.get_health()
+            health *= (1 + self.vigor/100)
+            self.set_health(health)
+        else:
+            print("You don't have enough level up points for this command!")
 
     def inc_strength(self):
-        self.strength += 1
+        if self.level_points >= 1:
+            self.strength += 1
+            self.level_points -= 1
+        else:
+            print("You don't have enough level up points for this command!")
 
     def inc_endurance(self):
-        self.endurance += 1
+        if self.level_points >= 1:
+            self.endurance += 1
+            self.level_points -= 1
+        else:
+            print("You don't have enough level up points for this command!")
         
     def monster_slain(self):
         self.current_experiance += 10
         if self.current_experiance >= self.needed_experiance_for_level_up:
             self.level += 1
+            self.level_points += 1
             self.current_experiance = 0
             self.needed_experiance_for_level_up *= 1.1
 
