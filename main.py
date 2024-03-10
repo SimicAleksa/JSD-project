@@ -37,6 +37,12 @@ def process_command(command):
             game_world.attack_enemy()
         elif command == "flee":
             game_world.flee()
+        elif command == "inc vigor":
+            game_world.player.inc_vigor()
+        elif command == "inc endurance":
+            game_world.player.inc_endurance()
+        elif command == "inc strength":
+            game_world.player.inc_strength()
         else:
             print("Invalid command")
 

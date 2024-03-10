@@ -17,7 +17,10 @@ POSSIBLE_COMMANDS = [
     "inventory",
     "health",
     "attack",
-    "flee"
+    "flee",
+    "inc vigor",
+    "inc endurance",
+    "inc strength",
 ]
 
 
