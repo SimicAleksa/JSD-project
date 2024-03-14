@@ -17,7 +17,7 @@ GeneralSettings:
 ;
 
 Region:
-    '<' name = GWID '>' '{'
+    'region' name = GWID '{'
         properties *= RegionProperties
         '::'
         connections *= Connection[',']
@@ -28,7 +28,7 @@ Region:
 ;
 
 Enemy:
-    '((' name = GWID '))' '{'
+    'enemy' name = GWID '{'
         properties *= EnemyProperties
     '}'
 ;
@@ -38,19 +38,19 @@ Requirement:
 ;
 
 Player:
-    '(' name = GWID ')' '{'
+    'player' name = GWID '{'
         properties *= PlayerProperties
     '}'
 ;
 
 Weapon:
-    '[[' name = GWID ']]' '{'
+    'weapon' name = GWID '{'
         properties *= WeaponProperties
     '}'
 ;
 
 Item:
-    '[' name = GWID ']' '{'
+    'item' name = GWID '{'
         properties *= ItemProperties
         'isStatic' isStatic = BOOL
     '}'
@@ -202,7 +202,8 @@ Keyword:
     'start_position' | 'final_position' | 'drop' | 'take' | 'open' | 'move' | 'N' | 'S' | 'E' | 'W' |
     'portrayal' | 'position' | 'heal' | 'health' | 'contains' | 'inventory' | 'isStatic' |
     'requirements' | 'damage' | 'environmental_dmg' | 'xp' | 'vigor' | 'endurance' | 'strength' | 'currentExperience' |
-    'neededExperienceForLevelUp' | 'dropsWeapon' | 'level'
+    'neededExperienceForLevelUp' | 'dropsWeapon' | 'level' |
+    'region' | 'item' | 'player' | 'enemy' | 'weapon'
 ;
 
 GWID:
