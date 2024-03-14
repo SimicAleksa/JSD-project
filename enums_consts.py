@@ -21,6 +21,7 @@ POSSIBLE_COMMANDS = [
     "inc vigor",
     "inc endurance",
     "inc strength",
+    "inc intelligence",
     "stats"
 ]
 

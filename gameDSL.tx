@@ -79,11 +79,15 @@ EnemyProperties:
 ;
 
 PlayerProperties:
-    BasicProperties | MovementProperties | PositionProperties | HealthProperties | InventoryProperties | AttributeProperties | LevelProperties
+    BasicProperties | MovementProperties | PositionProperties | HealthProperties | InventoryProperties | AttributeProperties | LevelProperties | BasicStatProperties
+;
+
+BasicStatProperties:
+    ManaProperties | HealthProperties | UnarmedDamageProperties | ManaDamageProperties | DefenceProperties | ManaDefenceProperties
 ;
 
 AttributeProperties:
-    VigorAttribute | EnduranceAttribute | StrengthAttribute
+    VigorAttribute | EnduranceAttribute | StrengthAttribute | IntelligenceAttribute
 ;
 
 BasicProperties:
@@ -162,6 +166,26 @@ HealthProperties:
     'health' health = INT
 ;
 
+ManaProperties:
+    'mana' mana = INT
+;
+
+UnarmedDamageProperties:
+    'unarmed_damage' unarmed_damage = INT
+;
+
+ManaDamageProperties:
+    'mana_damage' mana_damage = INT
+;
+
+DefenceProperties:
+    'defence' defence = INT
+;
+
+ManaDefenceProperties:
+    'mana_defence' mana_defence = INT
+;
+
 VigorAttribute:
     'vigor' vigor = INT
 ;
@@ -172,6 +196,10 @@ EnduranceAttribute:
 
 StrengthAttribute:
     'strength' strength = INT
+;
+
+IntelligenceAttribute:
+    'intelligence' intelligence = INT
 ;
 
 MovementProperties:

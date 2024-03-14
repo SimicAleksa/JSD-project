@@ -61,6 +61,12 @@
 (adventurer) {
     portrayal "You are an intrepid adventurer."
     health 100
+    mana 100
+    unarmed_damage 10
+    mana_damage 5
+    defence 5
+    mana_defence 0
+    intelligence 5
     vigor 10
     strength 10
     endurance 10

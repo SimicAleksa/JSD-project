@@ -142,6 +142,7 @@ class Player:
         self.name = name
         self.position = start_position
         self.inventory = []
+        # basic stats
         self.health = 100
         self.initial_health = 100
         self.current_experience = 0
@@ -149,13 +150,29 @@ class Player:
         self.level = 1
         self.level_points = 0
         self.properties = {}
+        self.base_health = 100
+        self.mana = 100
+        self.base_mana = 100
+        self.unarmed_damage = 0
+        self.mana_damage = 0
+        self.defence = 0
+        self.mana_defence = 0
+
         self.weapon = None
+        self.properties = {}
+        # attributes
         self.vigor = 10
         self.endurance = 10
         self.strength = 10
+        self.intelligence = 10
 
     def add_property(self, prop_name, prop_value):
         self.properties[prop_name] = prop_value
+        if prop_name == 'health':
+            self.base_health = prop_value
+            self.initial_health = prop_value
+        elif prop_name == 'mana':
+            self.base_mana = prop_value
 
     def remove_item(self, item):
         del self.position.items[item]
@@ -182,6 +199,8 @@ class Player:
             return self.inc_strength()
         elif stat == "endurance":
             return self.inc_endurance()
+        elif stat == "intelligence":
+            return self.inc_intelligence()
         else:
             return "Invalid stat"
 
@@ -189,12 +208,27 @@ class Player:
         if self.level_points >= 1:
             self.vigor += 1
             self.level_points -= 1
-            health = self.get_health()
-            health *= (1 + self.vigor / 100)
-            self.set_health(health)
+            self.scale_health_from_vigor()
             return "Vigor increased"
         else:
             return "You don't have enough level up points for this command!"
+
+    def add_vigor(self, vigor):
+        self.vigor += vigor
+        self.scale_health_from_vigor()
+
+    def subtract_vigor(self, vigor):
+        self.vigor -= vigor
+        self.scale_health_from_vigor()
+
+    def scale_health_from_vigor(self):
+        new_health = self.base_health * (1 + self.vigor / 100)
+        self.set_health(new_health)
+
+    def dec_vigor(self):
+        self.vigor -= 1
+        self.level_points += 1
+        self.scale_health_from_vigor()
 
     def inc_strength(self):
         if self.level_points >= 1:
@@ -203,6 +237,16 @@ class Player:
             return "Strength increased"
         else:
             return "You don't have enough level up points for this command!"
+
+    def dec_strength(self):
+        self.strength -= 1
+        self.level_points += 1
+
+    def add_strength(self, strength):
+        self.strength += strength
+
+    def subtract_strength(self, strength):
+        self.strength -= strength
 
     def inc_endurance(self):
         if self.level_points >= 1:
@@ -222,6 +266,64 @@ class Player:
                 self.needed_experience_for_level_up *= 1.1
                 print(f"You leveled up to: {self.level} level.")
             print(f"You have {self.level_points} points to use")
+
+    def dec_endurance(self):
+        self.endurance -= 1
+        self.level_points += 1
+
+    def add_endurance(self, endurance):
+        self.endurance += endurance
+
+    def subtract_endurance(self, endurance):
+        self.endurance -= endurance
+
+    def inc_intelligence(self):
+        if self.level_points >= 1:
+            self.intelligence += 1
+            self.level_points -= 1
+            self.scale_mana_from_intelligence()
+            return "Intelligence increased"
+        else:
+            return "You don't have enough level up points for this command!"
+
+    def scale_mana_from_intelligence(self):
+        new_mana = self.base_mana * (1 + self.intelligence / 100)
+        self.mana = new_mana
+
+    def dec_intelligence(self):
+        self.intelligence -= 1
+        self.level_points += 1
+        self.scale_mana_from_intelligence()
+
+    def add_intelligence(self, intelligence):
+        self.intelligence += intelligence
+
+    def subtract_intelligence(self, intelligence):
+        self.intelligence -= intelligence
+
+    def add_defence(self, defence):
+        self.defence += defence
+
+    def subtract_defence(self, defence):
+        self.defence = max(0, self.defence - defence)
+
+    def add_unarmed_damage(self, unarmed_damage):
+        self.unarmed_damage += unarmed_damage
+
+    def subtract_unarmed_damage(self, unarmed_damage):
+        self.unarmed_damage = max(0, self.unarmed_damage - unarmed_damage)
+
+    def add_mana_damage(self, mana_damage):
+        self.mana_damage += mana_damage
+
+    def subtract_mana_damage(self, mana_damage):
+        self.mana_damage = max(0, self.mana_damage - mana_damage)
+
+    def add_mana_defence(self, mana_defence):
+        self.mana_defence += mana_defence
+
+    def subtract_mana_defence(self, mana_defence):
+        self.mana_defence = max(0, self.mana_defence - mana_defence)
 
     def heal(self, amount):
         self.health += amount
@@ -321,7 +423,6 @@ class Player:
                 self.health = self.initial_health
                 return f"Your posessions are in {region.name}"
         return ""
-            
 
     def _drop_old_weapon(self, item, game_world):
         if item in self.inventory and item in game_world.weapons:
@@ -442,6 +543,10 @@ class Enemy:
         target.health -= self.damage
         return f"{self.name} hits you for {self.damage} damage"
 
+    def heal(self, amount):
+        self.health += amount
+        return "{self} healed " + amount
+
     def drop(self, item, game_world):
         if item in self.reward_items:
             self.reward_items.remove(item)
@@ -453,6 +558,9 @@ class Enemy:
 
     def print_self(self):
         return f'There is an enemy: {self.name}.'
+
+    def print_health(self):
+        return f'{self.name} has {self.health} health.'
 
 
 class Weapon:

@@ -54,6 +54,12 @@ def parse_dsl():
     vigor = 10
     strength = 10
     endurance = 10
+    intelligence = 10
+    mana = 0
+    unarmed_damage = 0
+    mana_damage = 0
+    defence = 0
+    mana_defence = 0
     for prop in player_def.properties:
         prop_name = prop.__class__.__name__
         if prop_name == "PositionProperties":
@@ -77,6 +83,19 @@ def parse_dsl():
             needed_experience_for_level_up = prop.neededExperienceForLevelUp
         elif prop_name == "LevelProperty":
             level = prop.level
+        elif prop_name == "IntelligenceAttribute":
+            intelligence = prop.intelligence
+        elif prop_name == "ManaProperties":
+            mana = prop.mana
+        elif prop_name == "UnarmedDamageProperties":
+            unarmed_damage = prop.unarmed_damage
+        elif prop_name == "ManaDamageProperties":
+            mana_damage = prop.mana_damage
+        elif prop_name == "DefenceProperties":
+            defence = prop.defence
+        elif prop_name == "ManaDefenceProperties":
+            mana_defence = prop.mana_defence
+
     player = Player(player_def.name, starting_position)
     player.health = health
     player.initial_health = health
@@ -87,6 +106,12 @@ def parse_dsl():
     player.vigor = vigor
     player.strength = strength
     player.endurance = endurance
+    player.intelligence = intelligence
+    player.mana = mana
+    player.unarmed_damage = unarmed_damage
+    player.mana_damage = mana_damage
+    player.defence = defence
+    player.mana_defence = mana_defence
 
     properties(player, player_def)
     game_world.player = player
@@ -139,6 +164,8 @@ def properties(obj, obj_def):
                 prop_value.append(item.name)
         elif prop_name == "HealthProperties":
             prop_value = prop.health
+        elif prop_name == "ManaProperties":
+            prop_value = prop.mana
         elif prop_name == "WeaponProperties":
             prop_value = prop.damage
         elif prop_name == "ItemsToDrop" or prop_name == "WeaponsToDrop":
@@ -155,4 +182,14 @@ def properties(obj, obj_def):
             prop_value = prop.endurance
         elif prop_name == "Experience":
             prop_value = prop.xp
+        elif prop_name == "IntelligenceAttribute":
+            prop_value = prop.intelligence
+        elif prop_name == "UnarmedDamageProperties":
+            prop_value = prop.unarmed_damage
+        elif prop_name == "ManaDamageProperties":
+            prop_value = prop.mana_damage
+        elif prop_name == "DefenceProperties":
+            prop_value = prop.defence
+        elif prop_name == "ManaDefenceProperties":
+            prop_value = prop.mana_defence
         obj.add_property(prop_name, prop_value)
