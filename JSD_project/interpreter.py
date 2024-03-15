@@ -1,7 +1,7 @@
 from textx import metamodel_from_file
 from os.path import join, dirname
 
-from pythonClassesDSL import GameWorld, Region, Player, Enemy, Item, HealAction, Weapon, GeneralSettings
+from JSD_project.pythonClassesDSL import GameWorld, Region, Player, Enemy, Item, HealAction, Weapon, GeneralSettings
 
 
 def parse_dsl():
@@ -10,7 +10,7 @@ def parse_dsl():
     dsl_mm = metamodel_from_file(join(this_folder, "gameDSL.tx"))
 
     # Parse the DSL file and create the GameWorld
-    model = dsl_mm.model_from_file("games/testGame.game/testGame.game")
+    model = dsl_mm.model_from_file("JSD_project/games/testGame.game/testGame.game")
 
     game_world = GameWorld()
 

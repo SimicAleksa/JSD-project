@@ -1,5 +1,5 @@
-from enums_consts import DIRECTIONS, display_help
-from interpreter import parse_dsl
+from JSD_project.enums_consts import DIRECTIONS, display_help
+from JSD_project.interpreter import parse_dsl
 
 global game_world
 
