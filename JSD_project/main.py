@@ -53,9 +53,13 @@ def initial_setup():
     print(game_world.player.print_self())
 
 
-if __name__ == "__main__":
+def run_main():
     initial_setup()
 
     while game_world.player.position != game_world.final_position:
         user_input = input(">>").strip()
         process_command(user_input)
+
+
+if __name__ == "__main__":
+    run_main()

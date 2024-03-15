@@ -1,0 +1,3 @@
+include JSD_project/*.game
+include JSD_project/*.txt
+include JSD_project/*.tx
