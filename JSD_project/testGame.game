@@ -121,10 +121,12 @@ enemy young_dragon {
 weapon katana {
     type sword
     healthDamage 10
-    modifies health
-    coefficients 10,43
-    modifies damage
-    coefficients 100,5,2
+    modifiers {
+        modifies health
+        coefficients 10,43
+        modifies damage
+        coefficients 100,5,2
+    }
 }
 
 weapon magic_wand {

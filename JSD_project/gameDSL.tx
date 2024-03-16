@@ -76,7 +76,7 @@ Weapon:
             ('healthCost' healthCost = INT)?
             ('manaCost' manaCost = INT)?
             ('requiredLevel' requiredLevel = INT)?
-            modifiers *= Modifier
+            ('modifiers' '{' modifiers *= Modifier '}')?
         )#
     '}'
 ;
@@ -87,7 +87,7 @@ Armor:
             'type' type = GWID
             'defense' defense = INT
             ('requiredLevel' requiredLevel = INT)?
-            modifiers *= Modifier
+            ('modifiers' '{' modifiers *= Modifier '}')?
         )#
     '}'
 ;

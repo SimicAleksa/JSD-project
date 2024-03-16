@@ -61,7 +61,8 @@ class GameWorld:
         damageVarianceLow = 1 - chosen_attack['damage_variance']
         damageVarianceHigh = 1 + chosen_attack['damage_variance']
         damage = int(chosen_attack['damage'] * uniform(damageVarianceLow, damageVarianceHigh))
-        player_health = self.player.get_health() - damage
+        defense = int(self.player.get_defense() * uniform(0.7, 1.3))
+        player_health = self.player.get_health() - max(damage - defense, 0)
         if player_health < 0:
             player_health = 0
         self.player.set_health(player_health)
@@ -193,12 +194,20 @@ class Player:
         del self.position.items[item]
 
     def strike_damage(self):
-        if self.weapon is None:
+        if self.weapon is None or self.weapon.mana_cost > self.mana or self.weapon.health_cost >= self.health:
             return self.damage
         else:
             damage = self.weapon.health_damage
             damage *= (1 + self.damage / 100)
+            self.mana -= self.weapon.mana_cost
+            self.health -= self.weapon.health_cost
             return damage
+
+    def get_defense(self):
+        if self.armor is None:
+            return self.defence
+        else:
+            return self.armor.defense * (1 + self.defence / 100)
 
     def print_stats(self):
         print(f"Current stats:\nVigor - {self.vigor}\nEndurance - {self.endurance}\nStrength - {self.strength}\nIntelligence - {self.intelligence}")
