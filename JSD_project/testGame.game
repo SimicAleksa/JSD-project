@@ -108,6 +108,9 @@ enemy young_dragon {
     dropsWeapon {
         katana
     }
+    dropsArmor {
+        shield
+    }
     healing {
         chance 0.1
         amount 10

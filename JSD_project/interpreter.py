@@ -206,7 +206,7 @@ def properties(obj, obj_def):
             prop_value = prop.mana
         elif prop_name == "WeaponProperties":
             prop_value = prop.damage
-        elif prop_name == "ItemsToDrop" or prop_name == "WeaponsToDrop":
+        elif prop_name in ["WeaponsToDrop", "ArmorsToDrop", "ItemsToDrop"]:
             prop_value = {}
             for item in prop.inventory:
                 prop_value[item.name] = item

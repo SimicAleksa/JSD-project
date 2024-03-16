@@ -345,7 +345,7 @@ class Player:
                         self.remove_stat_modifications(self.weapon)
                     self.weapon = game_world.weapons[item]
                     self.apply_stat_modifications(self.weapon)
-                    text = f"You equipped {item}. It deals additional {self.weapon.attack_damage} damage."
+                    text = f"You equipped {item}. It deals additional {self.weapon.health_damage} damage."
                 else:
                     text = "You cannot equip this."
             elif item in game_world.armors:
@@ -381,8 +381,6 @@ class Player:
             self._drop_old_weapon(self.weapon.name, game_world)
         if self.weapon is not None:
             self.remove_stat_modifications(self.weapon)
-        self.weapon = game_world.weapons[weapon]
-        self.apply_stat_modifications(self.weapon)
 
     def take_armor(self, armor, game_world):
         self.inventory.append(armor)
@@ -391,8 +389,6 @@ class Player:
             self._drop_old_armor(self.armor.name, game_world)
         if self.armor is not None:
             self.remove_stat_modifications(self.armor)
-        self.armor = game_world.armors[armor]
-        self.apply_stat_modifications(self.armor)
 
     def apply_stat_modifications(self, weapon):
         for property_to_modify, coefficients in weapon.modifiers.items():
@@ -459,12 +455,6 @@ class Player:
                         text = "You used " + item + ". Your health is now " + str(self.health)
                 else:
                     return "That item can't be used"
-            if item in game_world.weapons:
-                if self.weapon is not None:
-                    self.remove_stat_modifications(self.weapon)
-                self.weapon = game_world.weapons[item]
-                self.apply_stat_modifications(self.weapon)
-                text = f"You equipped {item}. It deals additional {game_world.weapons[item].attack_damage} damage."
             if game_world.current_enemy is not None and not game_world.settings.additional_turn_after_use:
                 text += "\n" + game_world.attack_player()
             return text
@@ -557,6 +547,8 @@ class Enemy:
             result.append(self.properties['ItemsToDrop'][i])
         for w in self.properties['WeaponsToDrop']:
             result.append(self.properties['WeaponsToDrop'][w])
+        for a in self.properties['ArmorsToDrop']:
+            result.append(self.properties['ArmorsToDrop'][a])
         return result
 
     def choose_attack(self):

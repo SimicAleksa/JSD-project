@@ -127,7 +127,7 @@ Containable:
 ;
 
 EnemyProperties:
-    BasicProperties | PositionProperties | HealthProperties | ItemsToDrop | WeaponsToDrop | Experience
+    BasicProperties | PositionProperties | HealthProperties | ItemsToDrop | WeaponsToDrop | ArmorsToDrop | Experience
 ;
 
 PlayerProperties:
@@ -208,6 +208,10 @@ ItemsToDrop:
 
 WeaponsToDrop:
     'dropsWeapon' '{' inventory *= [Weapon][','] '}'
+;
+
+ArmorsToDrop:
+    'dropsArmor' '{' inventory *= [Armor][','] '}'
 ;
 
 PositionProperties:
