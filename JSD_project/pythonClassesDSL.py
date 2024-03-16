@@ -1,3 +1,4 @@
+import random
 from random import uniform
 import numpy as np
 
@@ -54,13 +55,14 @@ class GameWorld:
                 print(f"{self.current_enemy.name} dropped {', '.join([item.name for item in dropped_items])}")
             self.current_enemy = None
         else:
+            self.heal_enemy()
             print(self.attack_player())
 
     def attack_player(self):
         chosen_attack = self.current_enemy.choose_attack()
-        damageVarianceLow = 1 - chosen_attack['damage_variance']
-        damageVarianceHigh = 1 + chosen_attack['damage_variance']
-        damage = int(chosen_attack['damage'] * uniform(damageVarianceLow, damageVarianceHigh))
+        damage_variance_low = 1 - chosen_attack['damage_variance']
+        damage_variance_high = 1 + chosen_attack['damage_variance']
+        damage = int(chosen_attack['damage'] * uniform(damage_variance_low, damage_variance_high))
         defense = int(self.player.get_defense() * uniform(0.7, 1.3))
         player_health = self.player.get_health() - max(damage - defense, 0)
         if player_health < 0:
@@ -76,6 +78,14 @@ class GameWorld:
             self.current_enemy.reset_health()
             self.current_enemy = None
         return text
+
+    def heal_enemy(self):
+        if self.current_enemy is not None and uniform(0, 1) < self.current_enemy.healing_chance:
+            healing_variance_low = 1 - self.current_enemy.healing_amount_variance
+            healing_variance_high = 1 + self.current_enemy.healing_amount_variance
+            amount = int(self.current_enemy.healing_amount * uniform(healing_variance_low, healing_variance_high))
+            self.current_enemy.heal(amount)
+            print(f"Enemy healed by {amount}. Enemy has {self.current_enemy.get_health()} health.")
 
 
 class Region:
@@ -538,6 +548,9 @@ class Enemy:
 
     def set_health(self, value):
         self.properties['HealthProperties'] = value
+
+    def heal(self, value):
+        self.properties['HealthProperties'] = min(self.initial_health, self.properties['HealthProperties'] + value)
 
     def reset_health(self):
         self.set_health(self.initial_health)

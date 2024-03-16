@@ -112,7 +112,7 @@ enemy young_dragon {
         shield
     }
     healing {
-        chance 0.1
+        chance 0.9
         amount 10
         amountVariance 0.2
     }
