@@ -1,8 +1,15 @@
 from textx import metamodel_from_file
 from os.path import join, dirname
 
-from JSD_project.pythonClassesDSL import GameWorld, Region, Player, Enemy, Item, HealAction, Weapon, GeneralSettings, Armor
-
+from JSD_project.dsl_classes.game_world import GameWorld
+from JSD_project.dsl_classes.player import Player
+from JSD_project.dsl_classes.region import Region
+from JSD_project.dsl_classes.enemy import Enemy
+from JSD_project.dsl_classes.item import Item
+from JSD_project.dsl_classes.weapon import Weapon
+from JSD_project.dsl_classes.armor import Armor
+from JSD_project.dsl_classes.actions import HealAction
+from JSD_project.dsl_classes.general_settings import GeneralSettings
 
 def parse_dsl():
     # Load the metamodel from the DSL grammar
