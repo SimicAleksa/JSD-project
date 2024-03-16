@@ -48,8 +48,12 @@ Enemy:
 AttackType:
     'attack' name = GWID '{'
         (
-            'damage' damage = INT
-            'damageVariance' damageVariance = FLOAT
+            'healthDamage' healthDamage = INT
+            'healthDamageVariance' healthDamageVariance = FLOAT
+            ('manaDamage' manaDamage = INT)?
+            ('manaDamageVariance' manaDamageVariance = FLOAT)?
+            ('healthCost' healthCost = INT)?
+            ('manaCost' manaCost = INT)?
             'frequency' frequency = FLOAT
         )#
     '}'
@@ -73,6 +77,7 @@ Weapon:
         (
             'type' type = GWID
             'healthDamage' healthDamage = INT
+            ('manaDamage' manaDamage = INT)?
             ('healthCost' healthCost = INT)?
             ('manaCost' manaCost = INT)?
             ('requiredLevel' requiredLevel = INT)?
@@ -86,6 +91,7 @@ Armor:
         (
             'type' type = GWID
             'defense' defense = INT
+            ('manaDefense' manaDefense = INT)?
             ('requiredLevel' requiredLevel = INT)?
             ('modifiers' '{' modifiers *= Modifier '}')?
         )#
@@ -98,7 +104,7 @@ Modifier:
 ;
 
 Modifiable:
-    'health' | 'mana' | 'damage' | 'defense'
+    'health' | 'mana' | 'damage' | 'defense' | 'manaDamage' | 'manaDefense'
 ;
 
 
@@ -127,11 +133,12 @@ Containable:
 ;
 
 EnemyProperties:
-    BasicProperties | PositionProperties | HealthProperties | ItemsToDrop | WeaponsToDrop | ArmorsToDrop | Experience
+    BasicProperties | PositionProperties | HealthProperties | ItemsToDrop | WeaponsToDrop | ArmorsToDrop | Experience | ManaProperties
 ;
 
 PlayerProperties:
-    BasicProperties | MovementProperties | PositionProperties | HealthProperties | InventoryProperties | AttributeProperties | LevelProperties | BasicStatProperties
+    BasicProperties | MovementProperties | PositionProperties | InventoryProperties | AttributeProperties |
+    LevelProperties | BasicStatProperties | ManaDefenceProperties | ManaDamageProperties
 ;
 
 BasicStatProperties:
@@ -232,6 +239,14 @@ UnarmedDamageProperties:
 
 DefenceProperties:
     'defence' defence = INT
+;
+
+ManaDefenceProperties:
+    'manaDefence' manaDefence = INT
+;
+
+ManaDamageProperties:
+    'manaDamage' manaDamage = INT
 ;
 
 VigorAttribute:

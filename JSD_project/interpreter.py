@@ -43,6 +43,7 @@ def parse_dsl():
             weapon_def.name,
             weapon_def.type,
             weapon_def.healthDamage,
+            weapon_def.manaDamage,
             weapon_def.healthCost,
             weapon_def.manaCost,
             weapon_def.requiredLevel
@@ -58,6 +59,7 @@ def parse_dsl():
             armor_def.name,
             armor_def.type,
             armor_def.defense,
+            armor_def.manaDefense,
             armor_def.requiredLevel
         )
         modifiers = armor_def.modifiers
@@ -80,6 +82,8 @@ def parse_dsl():
     mana = 0
     unarmed_damage = 0
     defence = 0
+    mana_damage = 0
+    mana_defence = 0
     for prop in player_def.properties:
         prop_name = prop.__class__.__name__
         if prop_name == "PositionProperties":
@@ -111,6 +115,10 @@ def parse_dsl():
             unarmed_damage = prop.unarmed_damage
         elif prop_name == "DefenceProperties":
             defence = prop.defence
+        elif prop_name == "ManaDefenceProperties":
+            mana_defence = prop.manaDefence
+        elif prop_name == "ManaDamageProperties":
+            mana_damage = prop.manaDamage
 
 
     player = Player(player_def.name, starting_position)
@@ -126,6 +134,12 @@ def parse_dsl():
 
     player.defence = defence
     player.unmodified_defence = defence
+
+    player.mana_damage = mana_damage
+    player.unmodified_mana_damage = mana_damage
+
+    player.mana_defence = mana_defence
+    player.unmodified_mana_defence = mana_defence
 
     player.current_experience = current_experience
     player.needed_experience_for_level_up = needed_experience_for_level_up
@@ -150,8 +164,12 @@ def parse_dsl():
         for attack in enemy_def.attackTypes:
             enemy.attacks.append({
                 'name': attack.name,
-                'damage': attack.damage,
-                'damage_variance': attack.damageVariance,
+                'health_damage': attack.healthDamage,
+                'health_damage_variance': attack.healthDamageVariance,
+                'mana_damage': attack.manaDamage,
+                'mana_damage_variance': attack.manaDamageVariance,
+                'health_cost': attack.healthCost,
+                'mana_cost': attack.manaCost,
                 'frequency': attack.frequency
             })
         enemy.healing_chance = enemy_def.healingChance

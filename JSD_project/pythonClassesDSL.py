@@ -38,11 +38,14 @@ class GameWorld:
 
     def attack_enemy(self):
         damage = int(self.player.strike_damage() * uniform(0.7, 1.3))
-        enemy_health = self.current_enemy.get_health() - damage
-        if enemy_health < 0:
-            enemy_health = 0
+        mana_damage = int(self.player.get_mana_damage() * uniform(0.7, 1.3))
+        enemy_health = max(self.current_enemy.get_health() - damage, 0)
+        enemy_mana = max(self.current_enemy.get_mana() - mana_damage, 0)
+
         self.current_enemy.set_health(enemy_health)
+        self.current_enemy.set_mana(enemy_mana)
         print(f"You dealt {damage} damage. Enemy has {self.current_enemy.get_health()} health.")
+        # TODO: print mana stats
         if enemy_health == 0:
             print(f"You beat {self.current_enemy.name}!")
             self.current_enemy.set_position_none()
@@ -62,12 +65,24 @@ class GameWorld:
         damage_variance_low = 1 - chosen_attack['damage_variance']
         damage_variance_high = 1 + chosen_attack['damage_variance']
         damage = int(chosen_attack['damage'] * uniform(damage_variance_low, damage_variance_high))
+
+        mana_damage_variance_low = 1 - chosen_attack['mana_damage_variance']
+        mana_damage_variance_high = 1 + chosen_attack['mana_damage_variance']
+        mana_damage = int(chosen_attack['mana_damage'] * uniform(mana_damage_variance_low, mana_damage_variance_high))
+
         defense = int(self.player.get_defense() * uniform(0.7, 1.3))
-        player_health = self.player.get_health() - max(damage - defense, 0)
-        if player_health < 0:
-            player_health = 0
+        mana_defence = int(self.player.get_mana_defence() * uniform(0.7, 1.3))
+
+        player_health = max(self.player.get_health() - max(damage - defense, 0), 0)
+        player_mana = max(self.player.get_mana() - max(mana_damage - mana_defence, 0), 0)
+
         self.player.set_health(player_health)
+        self.player.set_mana(player_mana)
         text = f"{self.current_enemy.name}'s turn.\n{self.current_enemy.name} dealt {damage} damage. You have {self.player.get_health()} health."
+        # TODO: print player mana stats
+        self.current_enemy.reduce_health(chosen_attack.health_cost)
+        self.current_enemy.reduce_mana(chosen_attack.mana_cost)
+        # TODO: print enemy stats
         if player_health == 0:
             text += "\nYou died"
             dropped_items_text = self.player.drop_items_after_death(self)
@@ -181,6 +196,12 @@ class Player:
         self.defence = 0
         self.unmodified_defence = 0
 
+        self.mana_damage = 0
+        self.unmodified_mana_damage = 0
+
+        self.mana_defence = 0
+        self.unmodified_mana_defence = 0
+
         self.weapon = None
         self.armor = None
         self.can_equip = []
@@ -212,11 +233,23 @@ class Player:
             self.health -= self.weapon.health_cost
             return damage
 
+    def get_mana_damage(self):
+        if self.weapon is None or self.weapon.mana_cost > self.mana or self.weapon.health_cost >= self.health:
+            return self.mana_damage
+        else:
+            return self.weapon.mana_damage * (1 + self.mana_damage / 100)
+
     def get_defense(self):
         if self.armor is None:
             return self.defence
         else:
             return self.armor.defense * (1 + self.defence / 100)
+
+    def get_mana_defense(self):
+        if self.armor is None:
+            return self.mana_defence
+        else:
+            return self.armor.mana_defense * (1 + self.mana_defence / 100)
 
     def print_stats(self):
         print(f"Current stats:\nVigor - {self.vigor}\nEndurance - {self.endurance}\nStrength - {self.strength}\nIntelligence - {self.intelligence}")
@@ -298,6 +331,11 @@ class Player:
 
     def set_health(self, value):
         self.health = value
+        self.unmodified_health = value
+
+    def set_mana(self, value):
+        self.mana = value
+        self.unmodified_mana = value
 
     def move(self, direction, game_world):
         if game_world.current_enemy is not None:
@@ -408,13 +446,13 @@ class Player:
         if self.armor is not None:
             self.remove_stat_modifications(self.armor)
 
-    def apply_stat_modifications(self, weapon):
-        for property_to_modify, coefficients in weapon.modifiers.items():
+    def apply_stat_modifications(self, item):
+        for property_to_modify, coefficients in item.modifiers.items():
             modified_value = np.polyval(coefficients, getattr(self, property_to_modify))
             setattr(self, property_to_modify, modified_value)
 
-    def remove_stat_modifications(self, weapon):
-        for property_to_modify, coefficients in weapon.modifiers.items():
+    def remove_stat_modifications(self, item):
+        for property_to_modify, coefficients in item.modifiers.items():
             original_value = getattr(self, f'unmodified_{property_to_modify}')
             setattr(self, property_to_modify, original_value)
 
@@ -522,6 +560,7 @@ class Enemy:
         self.position = ""  # Region object
         self.initial_health = 0
         self.damage = 0
+        self.mana_damage = 0
         self.properties = {}
         self.items_to_drop = {}
         self.weapons_to_drop = {}
@@ -545,17 +584,28 @@ class Enemy:
     def get_health(self):
         return self.properties['HealthProperties']
 
+    def get_mana(self):
+        if 'ManaProperties' not in self.properties:
+            return 0
+        return self.properties['ManaProperties']
+
     def set_health(self, value):
         self.properties['HealthProperties'] = value
+
+    def set_mana(self, value):
+        self.properties['ManaProperties'] = value
+
+    def reduce_health(self, value):
+        self.properties['HealthProperties'] -= value
+
+    def reduce_mana(self, value):
+        self.properties['ManaProperties'] -= value
 
     def heal(self, value):
         self.properties['HealthProperties'] = min(self.initial_health, self.properties['HealthProperties'] + value)
 
     def reset_health(self):
         self.set_health(self.initial_health)
-
-    def get_damage(self):
-        return self.properties['WeaponProperties']
 
     def add_property(self, prop_name, prop_value):
         self.properties[prop_name] = prop_value
@@ -573,21 +623,24 @@ class Enemy:
         return result
 
     def choose_attack(self):
-        if len(self.attacks) == 1:
-            return self.attacks[0]
-        attack_probabilities = [attack['frequency'] for attack in self.attacks]
+        feasible_attacks = [attack for attack in self.attacks if attack.health_cost < self.get_health() and attack.mana_cost <= self.get_mana()]
+        # TODO: handle case when no feasible attacks
+        if len(feasible_attacks) == 1:
+            return feasible_attacks[0]
+        attack_probabilities = [attack['frequency'] for attack in feasible_attacks]
         normalized_probabilities = np.array(attack_probabilities) / sum(attack_probabilities)
-        return np.random.choice(self.attacks, p=normalized_probabilities)
+        return np.random.choice(feasible_attacks, p=normalized_probabilities)
 
     def print_self(self):
         return f'There is an enemy: {self.name}.'
 
 
 class Weapon:
-    def __init__(self, name, weaponType, health_damage, health_cost, mana_cost, required_level):
+    def __init__(self, name, weaponType, health_damage, mana_damage, health_cost, mana_cost, required_level):
         self.name = name
         self.type = weaponType
         self.health_damage = health_damage
+        self.mana_damage = mana_damage
         self.health_cost = health_cost
         self.mana_cost = mana_cost
         self.required_level = required_level
@@ -598,10 +651,11 @@ class Weapon:
 
 
 class Armor:
-    def __init__(self, name, armorType, defense, required_level):
+    def __init__(self, name, armorType, defense, mana_defense, required_level):
         self.name = name
         self.type = armorType
         self.defense = defense
+        self.mana_defense = mana_defense
         self.required_level = required_level
         self.modifiers = {}
 
