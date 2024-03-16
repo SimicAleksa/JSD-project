@@ -1,4 +1,5 @@
 from random import uniform
+import numpy as np
 
 
 class GameWorld:
@@ -55,7 +56,10 @@ class GameWorld:
             print(self.attack_player())
 
     def attack_player(self):
-        damage = int(self.current_enemy.get_damage() * uniform(0.7, 1.3))
+        chosen_attack = self.current_enemy.choose_attack()
+        damageVarianceLow = 1 - chosen_attack['damage_variance']
+        damageVarianceHigh = 1 + chosen_attack['damage_variance']
+        damage = int(chosen_attack['damage'] * uniform(damageVarianceLow, damageVarianceHigh))
         player_health = self.player.get_health() - damage
         if player_health < 0:
             player_health = 0
@@ -142,24 +146,32 @@ class Player:
         self.name = name
         self.position = start_position
         self.inventory = []
+
         # basic stats
         self.health = 100
         self.initial_health = 100
+        self.unmodified_health = 100
+
         self.current_experience = 0
         self.needed_experience_for_level_up = 100
         self.level = 1
         self.level_points = 0
+
         self.properties = {}
+
         self.base_health = 100
         self.mana = 100
         self.base_mana = 100
-        self.unarmed_damage = 0
-        self.mana_damage = 0
+        self.unmodified_mana = 100
+
+        self.damage = 0
+        self.unmodified_damage = 0
+
         self.defence = 0
-        self.mana_defence = 0
+        self.unmodified_defence = 0
 
         self.weapon = None
-        self.properties = {}
+
         # attributes
         self.vigor = 10
         self.endurance = 10
@@ -177,20 +189,16 @@ class Player:
     def remove_item(self, item):
         del self.position.items[item]
 
-    def attack(self, target):
-        target.health -= 10
-        return f"You hit you for {target.name} damage"
-
     def strike_damage(self):
         if self.weapon is None:
-            return 10 * (self.strength / 10)
+            return self.damage
         else:
-            damage = self.weapon.get_damage()
-            damage *= (1 + self.strength / 100)
+            damage = self.weapon.health_damage
+            damage *= (1 + self.damage / 100)
             return damage
 
     def print_stats(self):
-        print(f"Current stats:\nVigor - {self.vigor}\nEndurance - {self.endurance}\nStrength - {self.strength}")
+        print(f"Current stats:\nVigor - {self.vigor}\nEndurance - {self.endurance}\nStrength - {self.strength}\nIntelligence - {self.intelligence}")
 
     def inc_stat(self, stat):
         if stat == "vigor":
@@ -213,69 +221,33 @@ class Player:
         else:
             return "You don't have enough level up points for this command!"
 
-    def add_vigor(self, vigor):
-        self.vigor += vigor
-        self.scale_health_from_vigor()
-
-    def subtract_vigor(self, vigor):
-        self.vigor -= vigor
-        self.scale_health_from_vigor()
-
     def scale_health_from_vigor(self):
         new_health = self.base_health * (1 + self.vigor / 100)
         self.set_health(new_health)
-
-    def dec_vigor(self):
-        self.vigor -= 1
-        self.level_points += 1
-        self.scale_health_from_vigor()
 
     def inc_strength(self):
         if self.level_points >= 1:
             self.strength += 1
             self.level_points -= 1
+            self.scale_damage_from_strength()
             return "Strength increased"
         else:
             return "You don't have enough level up points for this command!"
 
-    def dec_strength(self):
-        self.strength -= 1
-        self.level_points += 1
-
-    def add_strength(self, strength):
-        self.strength += strength
-
-    def subtract_strength(self, strength):
-        self.strength -= strength
+    def scale_damage_from_strength(self):
+        self.damage *= (1 + self.strength / 100)
 
     def inc_endurance(self):
         if self.level_points >= 1:
             self.endurance += 1
             self.level_points -= 1
+            self.scale_defence_from_endurance()
             return "Endurance increased"
         else:
             return "You don't have enough level up points for this command!"
 
-    def monster_slain(self, current_enemy):
-        self.current_experience += current_enemy.get_xp_value()
-        if self.current_experience >= self.needed_experience_for_level_up:
-            while self.current_experience >= self.needed_experience_for_level_up:
-                self.current_experience -= self.needed_experience_for_level_up
-                self.level += 1
-                self.level_points += 1
-                self.needed_experience_for_level_up *= 1.1
-                print(f"You leveled up to: {self.level} level.")
-            print(f"You have {self.level_points} points to use")
-
-    def dec_endurance(self):
-        self.endurance -= 1
-        self.level_points += 1
-
-    def add_endurance(self, endurance):
-        self.endurance += endurance
-
-    def subtract_endurance(self, endurance):
-        self.endurance -= endurance
+    def scale_defence_from_endurance(self):
+        self.defence *= (1 + self.endurance / 100)
 
     def inc_intelligence(self):
         if self.level_points >= 1:
@@ -287,43 +259,18 @@ class Player:
             return "You don't have enough level up points for this command!"
 
     def scale_mana_from_intelligence(self):
-        new_mana = self.base_mana * (1 + self.intelligence / 100)
-        self.mana = new_mana
+        self.mana = self.base_mana * (1 + self.intelligence / 100)
 
-    def dec_intelligence(self):
-        self.intelligence -= 1
-        self.level_points += 1
-        self.scale_mana_from_intelligence()
-
-    def add_intelligence(self, intelligence):
-        self.intelligence += intelligence
-
-    def subtract_intelligence(self, intelligence):
-        self.intelligence -= intelligence
-
-    def add_defence(self, defence):
-        self.defence += defence
-
-    def subtract_defence(self, defence):
-        self.defence = max(0, self.defence - defence)
-
-    def add_unarmed_damage(self, unarmed_damage):
-        self.unarmed_damage += unarmed_damage
-
-    def subtract_unarmed_damage(self, unarmed_damage):
-        self.unarmed_damage = max(0, self.unarmed_damage - unarmed_damage)
-
-    def add_mana_damage(self, mana_damage):
-        self.mana_damage += mana_damage
-
-    def subtract_mana_damage(self, mana_damage):
-        self.mana_damage = max(0, self.mana_damage - mana_damage)
-
-    def add_mana_defence(self, mana_defence):
-        self.mana_defence += mana_defence
-
-    def subtract_mana_defence(self, mana_defence):
-        self.mana_defence = max(0, self.mana_defence - mana_defence)
+    def monster_slain(self, current_enemy):
+        self.current_experience += current_enemy.get_xp_value()
+        if self.current_experience >= self.needed_experience_for_level_up:
+            while self.current_experience >= self.needed_experience_for_level_up:
+                self.current_experience -= self.needed_experience_for_level_up
+                self.level += 1
+                self.level_points += 1
+                self.needed_experience_for_level_up *= 1.1
+                print(f"You leveled up to: {self.level} level.")
+            print(f"You have {self.level_points} points to use")
 
     def heal(self, amount):
         self.health += amount
@@ -356,7 +303,7 @@ class Player:
                         return "Requirements not matched. You need a " + region.print_requirements(), False
         else:
             return "You can't go that way", False
-        
+
     def move_to_start_position(self, game_world):
         return self._change_player_position(game_world.start_position, game_world)
 
@@ -386,7 +333,7 @@ class Player:
                     return "You cant do that"
             if item in game_world.weapons:
                 self.take_weapon(item, game_world)
-                return f"You picked up {item}. You equipped {item}. It deals additional {game_world.weapons[item].get_damage()} damage."
+                return f"You picked up {item}. You equipped {item}. It deals additional {game_world.weapons[item].health_damage} damage."
         else:
             return "That item is not present in this room"
 
@@ -395,7 +342,20 @@ class Player:
         self.remove_item(weapon)
         if self.weapon is not None and game_world.settings.drop_old_weapon:
             self._drop_old_weapon(self.weapon.name, game_world)
+        if self.weapon is not None:
+            self.remove_weapon_modifications(self.weapon)
         self.weapon = game_world.weapons[weapon]
+        self.apply_weapon_modifications(self.weapon)
+
+    def apply_weapon_modifications(self, weapon):
+        for property_to_modify, coefficients in weapon.modifiers.items():
+            modified_value = np.polyval(coefficients, getattr(self, property_to_modify))
+            setattr(self, property_to_modify, modified_value)
+
+    def remove_weapon_modifications(self, weapon):
+        for property_to_modify, coefficients in weapon.modifiers.items():
+            original_value = getattr(self, f'unmodified_{property_to_modify}')
+            setattr(self, property_to_modify, original_value)
 
     def drop(self, item, game_world):
         if item in self.inventory:
@@ -405,7 +365,6 @@ class Player:
                 self.position.items[item] = game_world_item
                 return "You dropped " + item + " in " + self.position.name
         return "You dont have that item"
-    
 
     def drop_items_after_death(self, game_world):
         direction = game_world.opposite_dirs[game_world.prev_direction]
@@ -416,12 +375,12 @@ class Player:
                     if item in game_world.items:
                         region.items[item] = game_world.items[item]
                     elif item in game_world.weapons:
-                       region.items[item] = game_world.weapons[item] 
+                        region.items[item] = game_world.weapons[item]
                 self.inventory = []
                 self.weapon = None
                 self.current_experience = 0
                 self.health = self.initial_health
-                return f"Your posessions are in {region.name}"
+                return f"Your possessions are in {region.name}"
         return ""
 
     def _drop_old_weapon(self, item, game_world):
@@ -446,8 +405,11 @@ class Player:
                 else:
                     return "That item can't be used"
             if item in game_world.weapons:
+                if self.weapon is not None:
+                    self.remove_weapon_modifications(self.weapon)
                 self.weapon = game_world.weapons[item]
-                text = f"You equipped {item}. It deals additional {game_world.weapons[item].get_damage()} damage."
+                self.apply_weapon_modifications(self.weapon)
+                text = f"You equipped {item}. It deals additional {game_world.weapons[item].attack_damage} damage."
             if game_world.current_enemy is not None and not game_world.settings.additional_turn_after_use:
                 text += "\n" + game_world.attack_player()
             return text
@@ -497,10 +459,13 @@ class Enemy:
         self.position = ""  # Region object
         self.initial_health = 0
         self.damage = 0
-        self.reward_items = []
         self.properties = {}
         self.items_to_drop = {}
         self.weapons_to_drop = {}
+        self.attacks = []
+        self.healing_chance = 0
+        self.healing_amount = 0
+        self.healing_amount_variance = 0
 
     def get_xp_value(self):
         return self.properties['Experience']
@@ -521,7 +486,7 @@ class Enemy:
         self.properties['HealthProperties'] = value
 
     def reset_health(self):
-        self.set_health(self.initial_health)        
+        self.set_health(self.initial_health)
 
     def get_damage(self):
         return self.properties['WeaponProperties']
@@ -539,40 +504,28 @@ class Enemy:
             result.append(self.properties['WeaponsToDrop'][w])
         return result
 
-    def attack(self, target):
-        target.health -= self.damage
-        return f"{self.name} hits you for {self.damage} damage"
-
-    def heal(self, amount):
-        self.health += amount
-        return "{self} healed " + amount
-
-    def drop(self, item, game_world):
-        if item in self.reward_items:
-            self.reward_items.remove(item)
-            for game_world_item in game_world.items:
-                if item == game_world_item.name:
-                    self.position.items.append(game_world_item)
-                    return f"${self.name} dropped ${item}"
-        return f"${self.name} does not have that item"
+    def choose_attack(self):
+        if len(self.attacks) == 1:
+            return self.attacks[0]
+        attack_probabilities = [attack['frequency'] for attack in self.attacks]
+        normalized_probabilities = np.array(attack_probabilities) / sum(attack_probabilities)
+        return np.random.choice(self.attacks, p=normalized_probabilities)
 
     def print_self(self):
         return f'There is an enemy: {self.name}.'
 
-    def print_health(self):
-        return f'{self.name} has {self.health} health.'
-
 
 class Weapon:
-    def __init__(self, name):
+    def __init__(self, name, health_damage, health_cost, mana_cost, required_level):
         self.name = name
-        self.properties = {}
+        self.health_damage = health_damage
+        self.health_cost = health_cost
+        self.mana_cost = mana_cost
+        self.required_level = required_level
+        self.modifiers = {}
 
-    def get_damage(self):
-        return self.properties["WeaponProperties"]
-
-    def add_property(self, prop_name, prop_value):
-        self.properties[prop_name] = prop_value
+    def add_modifier(self, attr_name, coefficients):
+        self.modifiers[attr_name] = coefficients
 
 
 class HealAction:

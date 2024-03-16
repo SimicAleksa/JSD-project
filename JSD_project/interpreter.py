@@ -39,8 +39,16 @@ def parse_dsl():
 
     # Create weapons
     for weapon_def in model.weapons:
-        weapon = Weapon(weapon_def.name)
-        properties(weapon, weapon_def)
+        weapon = Weapon(
+            weapon_def.name,
+            weapon_def.healthDamage,
+            weapon_def.healthCost,
+            weapon_def.manaCost,
+            weapon_def.requiredLevel
+        )
+        modifiers = weapon_def.modifiers
+        for modifier in modifiers:
+            weapon.add_modifier(modifier.modifiableAttribute, modifier.coefficients)
         game_world.weapons[weapon_def.name] = weapon
 
     # Create player
@@ -57,9 +65,7 @@ def parse_dsl():
     intelligence = 10
     mana = 0
     unarmed_damage = 0
-    mana_damage = 0
     defence = 0
-    mana_defence = 0
     for prop in player_def.properties:
         prop_name = prop.__class__.__name__
         if prop_name == "PositionProperties":
@@ -89,29 +95,33 @@ def parse_dsl():
             mana = prop.mana
         elif prop_name == "UnarmedDamageProperties":
             unarmed_damage = prop.unarmed_damage
-        elif prop_name == "ManaDamageProperties":
-            mana_damage = prop.mana_damage
         elif prop_name == "DefenceProperties":
             defence = prop.defence
-        elif prop_name == "ManaDefenceProperties":
-            mana_defence = prop.mana_defence
+
 
     player = Player(player_def.name, starting_position)
     player.health = health
     player.initial_health = health
+    player.unmodified_health = health
+
+    player.mana = mana
+    player.unmodified_mana = mana
+
+    player.damage = unarmed_damage
+    player.unmodified_damage = unarmed_damage
+
+    player.defence = defence
+    player.unmodified_defence = defence
+
     player.current_experience = current_experience
     player.needed_experience_for_level_up = needed_experience_for_level_up
     player.level = level
     player.inventory = inventory
+
     player.vigor = vigor
     player.strength = strength
     player.endurance = endurance
     player.intelligence = intelligence
-    player.mana = mana
-    player.unarmed_damage = unarmed_damage
-    player.mana_damage = mana_damage
-    player.defence = defence
-    player.mana_defence = mana_defence
 
     properties(player, player_def)
     game_world.player = player
@@ -121,6 +131,16 @@ def parse_dsl():
         enemy = Enemy()
         enemy.name = enemy_def.name.replace("_", " ")
         properties(enemy, enemy_def)
+        for attack in enemy_def.attackTypes:
+            enemy.attacks.append({
+                'name': attack.name,
+                'damage': attack.damage,
+                'damage_variance': attack.damageVariance,
+                'frequency': attack.frequency
+            })
+        enemy.healing_chance = enemy_def.healingChance
+        enemy.healing_amount = enemy_def.healingAmount
+        enemy.healing_amount_variance = enemy_def.healingAmountVariance
         game_world.enemies.append(enemy)
 
     # Set start and final positions
@@ -186,10 +206,6 @@ def properties(obj, obj_def):
             prop_value = prop.intelligence
         elif prop_name == "UnarmedDamageProperties":
             prop_value = prop.unarmed_damage
-        elif prop_name == "ManaDamageProperties":
-            prop_value = prop.mana_damage
         elif prop_name == "DefenceProperties":
             prop_value = prop.defence
-        elif prop_name == "ManaDefenceProperties":
-            prop_value = prop.mana_defence
         obj.add_property(prop_name, prop_value)

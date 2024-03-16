@@ -29,7 +29,27 @@ Region:
 
 Enemy:
     'enemy' name = GWID '{'
-        properties *= EnemyProperties
+        (
+            properties *= EnemyProperties
+            'attacks' '{' attackTypes += AttackType '}'
+            ('healing' '{'
+                (
+                    'chance' healingChance = FLOAT
+                    'amount' healingAmount = INT
+                    'amountVariance' healingAmountVariance = FLOAT
+                )#
+            '}')?
+        )#
+    '}'
+;
+
+AttackType:
+    'attack' name = GWID '{'
+        (
+            'damage' damage = INT
+            'damageVariance' damageVariance = FLOAT
+            'frequency' frequency = FLOAT
+        )#
     '}'
 ;
 
@@ -45,9 +65,36 @@ Player:
 
 Weapon:
     'weapon' name = GWID '{'
-        properties *= WeaponProperties
+        (
+            'type' type = GWID
+            'healthDamage' healthDamage = INT
+            ('healthCost' healthCost = INT)?
+            ('manaCost' manaCost = INT)?
+            ('requiredLevel' requiredLevel = INT)?
+            modifiers *= WeaponModifier
+        )#
     '}'
 ;
+
+Armor:
+    'armor' name = GWID '{'
+        (
+            'type' type = GWID
+            'defense' defense = INT
+            ('requiredLevel' requiredLevel = INT)?
+        )#
+    '}'
+;
+
+WeaponModifier:
+    'modifies' modifiableAttribute = Modifiable
+    'coefficients' coefficients += INT[',']
+;
+
+Modifiable:
+    'health' | 'mana' | 'damage' | 'defense'
+;
+
 
 Item:
     'item' name = GWID '{'
@@ -55,7 +102,6 @@ Item:
         'isStatic' isStatic = BOOL
     '}'
 ;
-
 
 
 Connection:
@@ -75,7 +121,7 @@ Containable:
 ;
 
 EnemyProperties:
-    BasicProperties | PositionProperties | HealthProperties | ActivationProperties | InventoryProperties | WeaponProperties | ItemsToDrop | WeaponsToDrop | Experience
+    BasicProperties | PositionProperties | HealthProperties | ItemsToDrop | WeaponsToDrop | Experience
 ;
 
 PlayerProperties:
@@ -83,7 +129,7 @@ PlayerProperties:
 ;
 
 BasicStatProperties:
-    ManaProperties | HealthProperties | UnarmedDamageProperties | ManaDamageProperties | DefenceProperties | ManaDefenceProperties
+    ManaProperties | HealthProperties | UnarmedDamageProperties | DefenceProperties
 ;
 
 AttributeProperties:
@@ -171,19 +217,11 @@ ManaProperties:
 ;
 
 UnarmedDamageProperties:
-    'unarmed_damage' unarmed_damage = INT
-;
-
-ManaDamageProperties:
-    'mana_damage' mana_damage = INT
+    'damage' unarmed_damage = INT
 ;
 
 DefenceProperties:
     'defence' defence = INT
-;
-
-ManaDefenceProperties:
-    'mana_defence' mana_defence = INT
 ;
 
 VigorAttribute:

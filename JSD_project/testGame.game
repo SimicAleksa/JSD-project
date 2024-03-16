@@ -66,10 +66,8 @@ player adventurer {
     portrayal "You are an intrepid adventurer."
     health 100
     mana 100
-    unarmed_damage 10
-    mana_damage 5
+    damage 10
     defence 5
-    mana_defence 0
     intelligence 5
     vigor 10
     strength 10
@@ -84,9 +82,20 @@ player adventurer {
 }
 
 enemy young_dragon {
+    attacks {
+        attack fire_attack {
+            damage 30
+            damageVariance 0.2
+            frequency 0.6
+        }
+        attack kick_attack {
+            damage 40
+            damageVariance 0.1
+            frequency 0.4
+        }
+    }
     portrayal "A young playful dragon looking for trouble."
     health 1000
-    damage 40
     xp 50
     position kitchen
     drops {
@@ -96,14 +105,27 @@ enemy young_dragon {
     dropsWeapon {
         katana
     }
+    healing {
+        chance 0.1
+        amount 10
+        amountVariance 0.2
+    }
 }
 
 weapon katana {
-    damage 10
+    type sword
+    healthDamage 10
+    modifies health
+    coefficients 10,43
+    modifies damage
+    coefficients 100,5,2
 }
 
 weapon magic_wand {
-    damage 20
+    type magic
+    requiredLevel 4
+    manaCost 10
+    healthDamage 5
 }
 
 *settings* {
