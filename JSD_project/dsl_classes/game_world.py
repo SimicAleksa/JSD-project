@@ -43,6 +43,9 @@ class GameWorld:
 
         self.current_enemy.set_health(enemy_health)
         self.current_enemy.set_mana(enemy_mana)
+
+        self.player.mana -= self.player.weapon.mana_cost
+        self.player.health -= self.player.weapon.health_cost
         print(f"You dealt {damage} damage. Enemy has {self.current_enemy.get_health()} health.")
         # TODO: print mana stats
         if enemy_health == 0:

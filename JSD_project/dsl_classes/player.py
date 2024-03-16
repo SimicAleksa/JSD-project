@@ -61,17 +61,13 @@ class Player:
         if self.weapon is None or self.weapon.mana_cost > self.mana or self.weapon.health_cost >= self.health:
             return self.damage
         else:
-            damage = self.weapon.health_damage
-            damage *= (1 + self.damage / 100)
-            self.mana -= self.weapon.mana_cost
-            self.health -= self.weapon.health_cost
-            return damage
+            return self.damage * (1 + self.weapon.health_damage / 100)
 
     def get_mana_damage(self):
         if self.weapon is None or self.weapon.mana_cost > self.mana or self.weapon.health_cost >= self.health:
             return self.mana_damage
         else:
-            return self.weapon.mana_damage * (1 + self.mana_damage / 100)
+            return self.mana_damage * (1 + self.weapon.mana_damage / 100)
 
     def get_defense(self):
         if self.armor is None:
