@@ -16,6 +16,7 @@ def process_command(command):
     try:
         action, arg = command.split(" ", 1)
         if action in commands_mapping:
+            text = ""
             if "move" in command:
                 if command in DIRECTIONS:
                     text, moved = commands_mapping[action](arg, game_world)

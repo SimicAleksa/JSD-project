@@ -1,6 +1,6 @@
 region entryway {
     portrayal "the entryway of a haunted house"
-    contains key, flashlight, chest, magic_wand
+    contains key, flashlight, chest, magic_wand, shield
     ::
     N -> hallway
     ::
@@ -79,6 +79,9 @@ player adventurer {
         twix
     }
     position entryway
+    canEquip {
+        sword,wood
+    }
 }
 
 enemy young_dragon {
@@ -126,6 +129,12 @@ weapon magic_wand {
     requiredLevel 4
     manaCost 10
     healthDamage 5
+}
+
+armor shield {
+    type wood
+    requiredLevel 1
+    defense 30
 }
 
 *settings* {

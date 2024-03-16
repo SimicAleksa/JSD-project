@@ -4,6 +4,7 @@ GameWorld:
     player = Player
     enemies += Enemy
     weapons += Weapon
+    armors *= Armor
     settings += GeneralSettings
     'start_position' start_position = [Region]
     'final_position' final_position = [Region]
@@ -11,7 +12,8 @@ GameWorld:
 
 GeneralSettings:
     '*settings*' '{'
-        'dropOldWeapon' dropOldWeapon = BOOL?
+        ('dropOldWeapon' dropOldWeapon = BOOL)?
+        ('dropOldArmor' dropOldArmor = BOOL)?
         'additionalTurnAfterUse' additionalTurnAfterUse = BOOL?
     '}'
 ;
@@ -59,7 +61,10 @@ Requirement:
 
 Player:
     'player' name = GWID '{'
-        properties *= PlayerProperties
+        (
+            properties *= PlayerProperties
+            'canEquip' '{' canEquip *= GWID[','] '}'
+        )#
     '}'
 ;
 
@@ -71,7 +76,7 @@ Weapon:
             ('healthCost' healthCost = INT)?
             ('manaCost' manaCost = INT)?
             ('requiredLevel' requiredLevel = INT)?
-            modifiers *= WeaponModifier
+            modifiers *= Modifier
         )#
     '}'
 ;
@@ -82,11 +87,12 @@ Armor:
             'type' type = GWID
             'defense' defense = INT
             ('requiredLevel' requiredLevel = INT)?
+            modifiers *= Modifier
         )#
     '}'
 ;
 
-WeaponModifier:
+Modifier:
     'modifies' modifiableAttribute = Modifiable
     'coefficients' coefficients += INT[',']
 ;
@@ -117,7 +123,7 @@ ContainsProperties:
 ;
 
 Containable:
-    Item | Weapon
+    Item | Weapon | Armor
 ;
 
 EnemyProperties:

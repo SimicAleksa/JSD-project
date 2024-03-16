@@ -1,7 +1,7 @@
 from textx import metamodel_from_file
 from os.path import join, dirname
 
-from JSD_project.pythonClassesDSL import GameWorld, Region, Player, Enemy, Item, HealAction, Weapon, GeneralSettings
+from JSD_project.pythonClassesDSL import GameWorld, Region, Player, Enemy, Item, HealAction, Weapon, GeneralSettings, Armor
 
 
 def parse_dsl():
@@ -50,6 +50,18 @@ def parse_dsl():
         for modifier in modifiers:
             weapon.add_modifier(modifier.modifiableAttribute, modifier.coefficients)
         game_world.weapons[weapon_def.name] = weapon
+
+    # Create armors
+    for armor_def in model.armors:
+        armor = Armor(
+            armor_def.name,
+            armor_def.defense,
+            armor_def.requiredLevel
+        )
+        modifiers = armor_def.modifiers
+        for modifier in modifiers:
+            armor.add_modifier(modifier.modifiableAttribute, modifier.coefficients)
+        game_world.armors[armor_def.name] = armor
 
     # Create player
     player_def = model.player
@@ -157,6 +169,8 @@ def parse_dsl():
             settings.set_additional_turn_after_use(True)
         if settings_def.dropOldWeapon:
             settings.set_drop_old_weapon(True)
+        if settings_def.dropOldArmor:
+            settings.set_drop_old_armor(True)
         game_world.settings = settings
 
     return game_world
@@ -192,8 +206,7 @@ def properties(obj, obj_def):
             prop_value = {}
             for item in prop.inventory:
                 prop_value[item.name] = item
-        # elif prop_name == "AttributeProperties":
-        #     pass
+
         elif prop_name == "VigorAttribute":
             prop_value = prop.vigor
         elif prop_name == "StrengthAttribute":

@@ -8,6 +8,7 @@ class GameWorld:
         self.items = {}
         self.enemies = []
         self.weapons = {}
+        self.armors = {}
         self.player = None
         self.current_enemy = None
         self.start_position = None
@@ -171,6 +172,7 @@ class Player:
         self.unmodified_defence = 0
 
         self.weapon = None
+        self.armor = None
 
         # attributes
         self.vigor = 10
@@ -272,13 +274,6 @@ class Player:
                 print(f"You leveled up to: {self.level} level.")
             print(f"You have {self.level_points} points to use")
 
-    def heal(self, amount):
-        self.health += amount
-        if amount > 0:
-            return "You healed " + amount
-        else:
-            return "You took " + amount + " damage"
-
     def get_health(self):
         return self.health
 
@@ -333,9 +328,33 @@ class Player:
                     return "You cant do that"
             if item in game_world.weapons:
                 self.take_weapon(item, game_world)
-                return f"You picked up {item}. You equipped {item}. It deals additional {game_world.weapons[item].health_damage} damage."
+                return f"You picked up {item}. You can now equip it."
+            if item in game_world.armors:
+                self.take_armor(item, game_world)
+                return f"You picked up {item}. You can now equip it."
         else:
             return "That item is not present in this room"
+
+    def equip(self, item, game_world):
+        if item in self.inventory:
+            text = ""
+            if item in game_world.weapons:
+                if self.weapon is not None:
+                    self.remove_stat_modifications(self.weapon)
+                self.weapon = game_world.weapons[item]
+                self.apply_stat_modifications(self.weapon)
+                text = f"You equipped {item}. It deals additional {self.weapon.attack_damage} damage."
+            elif item in game_world.armors:
+                if self.armor is not None:
+                    self.remove_stat_modifications(self.armor)
+                self.armor = game_world.armors[item]
+                self.apply_stat_modifications(self.armor)
+                text = f"You equipped {item}. It gives additional {self.armor.defense} defense."
+            if game_world.current_enemy is not None and not game_world.settings.additional_turn_after_use:
+                text += "\n" + game_world.attack_player()
+            return text
+        return f"You don't have that item {item}"
+
 
     def take_weapon(self, weapon, game_world):
         self.inventory.append(weapon)
@@ -343,16 +362,26 @@ class Player:
         if self.weapon is not None and game_world.settings.drop_old_weapon:
             self._drop_old_weapon(self.weapon.name, game_world)
         if self.weapon is not None:
-            self.remove_weapon_modifications(self.weapon)
+            self.remove_stat_modifications(self.weapon)
         self.weapon = game_world.weapons[weapon]
-        self.apply_weapon_modifications(self.weapon)
+        self.apply_stat_modifications(self.weapon)
 
-    def apply_weapon_modifications(self, weapon):
+    def take_armor(self, armor, game_world):
+        self.inventory.append(armor)
+        self.remove_item(armor)
+        if self.armor is not None and game_world.settings.drop_old_armor:
+            self._drop_old_armor(self.armor.name, game_world)
+        if self.armor is not None:
+            self.remove_stat_modifications(self.armor)
+        self.armor = game_world.armors[armor]
+        self.apply_stat_modifications(self.armor)
+
+    def apply_stat_modifications(self, weapon):
         for property_to_modify, coefficients in weapon.modifiers.items():
             modified_value = np.polyval(coefficients, getattr(self, property_to_modify))
             setattr(self, property_to_modify, modified_value)
 
-    def remove_weapon_modifications(self, weapon):
+    def remove_stat_modifications(self, weapon):
         for property_to_modify, coefficients in weapon.modifiers.items():
             original_value = getattr(self, f'unmodified_{property_to_modify}')
             setattr(self, property_to_modify, original_value)
@@ -391,6 +420,14 @@ class Player:
         else:
             print("You don't have that item")
 
+    def _drop_old_armor(self, item, game_world):
+        if item in self.inventory and item in game_world.armors:
+            self.position.items[item] = game_world.armors[item]
+            self.inventory.remove(item)
+            print("You dropped " + item + " in " + self.position.name)
+        else:
+            print("You don't have that item")
+
     def use(self, item, game_world):
         if item in self.inventory:
             text = ""
@@ -406,9 +443,9 @@ class Player:
                     return "That item can't be used"
             if item in game_world.weapons:
                 if self.weapon is not None:
-                    self.remove_weapon_modifications(self.weapon)
+                    self.remove_stat_modifications(self.weapon)
                 self.weapon = game_world.weapons[item]
-                self.apply_weapon_modifications(self.weapon)
+                self.apply_stat_modifications(self.weapon)
                 text = f"You equipped {item}. It deals additional {game_world.weapons[item].attack_damage} damage."
             if game_world.current_enemy is not None and not game_world.settings.additional_turn_after_use:
                 text += "\n" + game_world.attack_player()
@@ -528,6 +565,17 @@ class Weapon:
         self.modifiers[attr_name] = coefficients
 
 
+class Armor:
+    def __init__(self, name, defense, required_level):
+        self.name = name
+        self.defense = defense
+        self.required_level = required_level
+        self.modifiers = {}
+
+    def add_modifier(self, attr_name, coefficients):
+        self.modifiers[attr_name] = coefficients
+
+
 class HealAction:
     def __init__(self, name, amount):
         self.name = name
@@ -543,10 +591,14 @@ class AttackAction:
 class GeneralSettings:
     def __init__(self):
         self.drop_old_weapon = False
+        self.drop_old_armor = False
         self.additional_turn_after_use = False
 
     def set_drop_old_weapon(self, value):
         self.drop_old_weapon = value
+
+    def set_drop_old_armor(self, value):
+        self.drop_old_armor = value
 
     def set_additional_turn_after_use(self, value):
         self.additional_turn_after_use = value
