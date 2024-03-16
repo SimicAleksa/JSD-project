@@ -2,57 +2,49 @@ import numpy as np
 
 
 class Player:
-    def __init__(self, name, start_position):
+    def __init__(self, name, start_position, vigor, endurance, strength, intelligence, health, mana, damage, defence, mana_damage, mana_defence):
         self.name = name
         self.position = start_position
         self.inventory = []
 
         # basic stats
-        self.health = 100
-        self.initial_health = 100
-        self.unmodified_health = 100
+        self.health = health
+        self.initial_health = health
+
+        self.current_max_health = health
+        self.unmodified_current_max_health = health
 
         self.current_experience = 0
         self.needed_experience_for_level_up = 100
         self.level = 1
         self.level_points = 0
 
-        self.properties = {}
+        self.base_health = health
+        self.mana = mana
+        self.base_mana = mana
+        self.unmodified_mana = mana
 
-        self.base_health = 100
-        self.mana = 100
-        self.base_mana = 100
-        self.unmodified_mana = 100
+        self.damage = damage
+        self.unmodified_damage = damage
 
-        self.damage = 0
-        self.unmodified_damage = 0
+        self.defence = defence
+        self.unmodified_defence = defence
 
-        self.defence = 0
-        self.unmodified_defence = 0
+        self.mana_damage = mana_damage
+        self.unmodified_mana_damage = mana_damage
 
-        self.mana_damage = 0
-        self.unmodified_mana_damage = 0
-
-        self.mana_defence = 0
-        self.unmodified_mana_defence = 0
+        self.mana_defence = mana_defence
+        self.unmodified_mana_defence = mana_defence
 
         self.weapon = None
         self.armor = None
         self.can_equip = []
 
         # attributes
-        self.vigor = 10
-        self.endurance = 10
-        self.strength = 10
-        self.intelligence = 10
-
-    def add_property(self, prop_name, prop_value):
-        self.properties[prop_name] = prop_value
-        if prop_name == 'health':
-            self.base_health = prop_value
-            self.initial_health = prop_value
-        elif prop_name == 'mana':
-            self.base_mana = prop_value
+        self.vigor = vigor
+        self.endurance = endurance
+        self.strength = strength
+        self.intelligence = intelligence
 
     def remove_item(self, item):
         del self.position.items[item]
@@ -106,8 +98,8 @@ class Player:
             return "You don't have enough level up points for this command!"
 
     def scale_health_from_vigor(self):
-        new_health = self.base_health * (1 + self.vigor / 100)
-        self.set_health(new_health)
+        self.current_max_health = self.base_health * (1 + self.vigor / 100)
+        self.unmodified_current_max_health = self.current_max_health
 
     def inc_strength(self):
         if self.level_points >= 1:
@@ -120,6 +112,7 @@ class Player:
 
     def scale_damage_from_strength(self):
         self.damage *= (1 + self.strength / 100)
+        self.unmodified_damage = self.damage
 
     def inc_endurance(self):
         if self.level_points >= 1:
@@ -132,6 +125,7 @@ class Player:
 
     def scale_defence_from_endurance(self):
         self.defence *= (1 + self.endurance / 100)
+        self.unmodified_defence = self.defence
 
     def inc_intelligence(self):
         if self.level_points >= 1:
@@ -144,6 +138,7 @@ class Player:
 
     def scale_mana_from_intelligence(self):
         self.mana = self.base_mana * (1 + self.intelligence / 100)
+        self.unmodified_mana = self.mana
 
     def monster_slain(self, current_enemy):
         self.current_experience += current_enemy.get_xp_value()
@@ -161,7 +156,14 @@ class Player:
 
     def set_health(self, value):
         self.health = value
-        self.unmodified_health = value
+
+    def heal(self, value):
+        self.health = min(self.current_max_health, self.health + value)
+
+    def restore_mana(self, value):
+        # TODO
+        pass
+
 
     def set_mana(self, value):
         self.mana = value
@@ -333,14 +335,12 @@ class Player:
             text = ""
             if item in game_world.items:
                 game_world_item = game_world.items[item]
-                if "ActivationProperties" in game_world_item.properties:
-                    action = game_world_item.properties["ActivationProperties"]
-                    if action.name == "HealAction":
-                        self.inventory.remove(item)
-                        self.health += action.amount
-                        text = "You used " + item + ". Your health is now " + str(self.health)
-                else:
+                if len(game_world_item.activations) == 0:
                     return "That item can't be used"
+                for action in game_world_item.activations:
+                    action.activate()
+                self.inventory.remove(item)
+                text = "You used " + item + ". Your health is now " + str(self.health)
             if game_world.current_enemy is not None and not game_world.settings.additional_turn_after_use:
                 text += "\n" + game_world.attack_player()
             return text
@@ -350,8 +350,8 @@ class Player:
         if self.position.is_item_contained(item):
             if item in game_world.items:
                 game_world_item = game_world.items[item]
-                if "ContainsProperties" in game_world_item.properties:
-                    for containItem in game_world_item.properties["ContainsProperties"]:
+                if len(game_world_item.contains) > 0:
+                    for containItem in game_world_item.contains:
                         for temp_game_world_item in game_world.items:
                             if temp_game_world_item == containItem:
                                 self.position.items[temp_game_world_item] = game_world.items[temp_game_world_item]

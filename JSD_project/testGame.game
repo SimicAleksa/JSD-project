@@ -63,28 +63,41 @@ item flashlight {
 }
 
 player adventurer {
+    currentExperience 0
+    neededExperienceForLevelUp 20
+    level 1
     portrayal "You are an intrepid adventurer."
-    health 100
-    mana 100
-    damage 10
-    defence 5
+    position entryway
+    inventory {
+        twix
+    }
     intelligence 5
     vigor 10
     strength 10
     endurance 10
-    currentExperience 0
-    neededExperienceForLevelUp 20
-    level 1
-    inventory {
-        twix
-    }
-    position entryway
+
+    health 100
+    mana 100
+    damage 10
+    defence 5
+
     canEquip {
         sword,wood
     }
 }
 
 enemy young_dragon {
+    portrayal "A young playful dragon looking for trouble."
+    position kitchen
+    drops {
+        twix,
+        mars,
+        katana,
+        shield
+    }
+    health 1000
+    mana 10
+    xp 50
     attacks {
         attack fire_attack {
             healthDamage 30
@@ -97,21 +110,6 @@ enemy young_dragon {
             frequency 0.4
         }
     }
-    portrayal "A young playful dragon looking for trouble."
-    health 1000
-    mana 10
-    xp 50
-    position kitchen
-    drops {
-        twix,
-        mars
-    }
-    dropsWeapon {
-        katana
-    }
-    dropsArmor {
-        shield
-    }
     healing {
         chance 0.5
         amount 10
@@ -123,7 +121,7 @@ weapon katana {
     type sword
     healthDamage 10
     modifiers {
-        modifies health
+        modifies current_max_health
         coefficients 10,43
         modifies damage
         coefficients 100,5,2

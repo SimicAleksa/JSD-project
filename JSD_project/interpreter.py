@@ -8,7 +8,7 @@ from JSD_project.dsl_classes.enemy import Enemy
 from JSD_project.dsl_classes.item import Item
 from JSD_project.dsl_classes.weapon import Weapon
 from JSD_project.dsl_classes.armor import Armor
-from JSD_project.dsl_classes.actions import HealAction
+from JSD_project.dsl_classes.actions import HealAction, RestoreManaAction
 from JSD_project.dsl_classes.general_settings import GeneralSettings
 
 def parse_dsl():
@@ -23,25 +23,27 @@ def parse_dsl():
 
     # Create regions
     for region_def in model.regions:
-        region = Region(region_def.name)
-        properties(region, region_def)
+        region = Region(region_def.name, region_def.portrayal)
         for connection in region_def.connections:
             region.add_connection(connection.direction, connection.target)
         for requirement in region_def.requirements:
             region.add_requirements(requirement)
         if region_def.environmental_dmg:
             region.add_environmental_dmg(region_def.environmental_dmg)
-        for prop in region_def.properties:
-            prop_name = prop.__class__.__name__
-            if prop_name == "ContainsProperties":
-                for item in prop.contains:
-                    region.items[item.name] = item
+        for item in region_def.contains:
+            region.add_item(item)
         game_world.regions.append(region)
 
     # Create items
     for item_def in model.items:
-        item = Item(item_def.name, item_def.isStatic)
-        properties(item, item_def)
+        item = Item(item_def.name, item_def.portrayal, item_def.isStatic)
+        item.contains = [item.name for item in item_def.contains]
+        for activation in item_def.activations:
+            action_name = activation.action.__class__.__name__
+            if action_name == "RestoreHealthAction":
+                item.activations.append(HealAction(activation.action.amount))
+            elif action_name == "RestoreManaAction":
+                item.activations.append(RestoreManaAction(activation.action.amount))
         game_world.items[item.name] = item
 
     # Create weapons
@@ -76,98 +78,25 @@ def parse_dsl():
 
     # Create player
     player_def = model.player
-    starting_position = None
-    health = 0
-    current_experience = 0
-    needed_experience_for_level_up = 100
-    level = 1
-    inventory = []
-    vigor = 10
-    strength = 10
-    endurance = 10
-    intelligence = 10
-    mana = 0
-    unarmed_damage = 0
-    defence = 0
-    mana_damage = 0
-    mana_defence = 0
-    for prop in player_def.properties:
-        prop_name = prop.__class__.__name__
-        if prop_name == "PositionProperties":
-            for player_region in game_world.regions:
-                if prop.position.name == player_region.name:
-                    starting_position = player_region
-        elif prop_name == "HealthProperties":
-            health = prop.health
-        elif prop_name == "InventoryProperties":
-            for item in prop.inventory:
-                inventory.append(item.name)
-        elif prop_name == "VigorAttribute":
-            vigor = prop.vigor
-        elif prop_name == "StrengthAttribute":
-            strength = prop.strength
-        elif prop_name == "EnduranceAttribute":
-            endurance = prop.endurance
-        elif prop_name == "CurrentExpProperty":
-            current_experience = prop.currentExperience
-        elif prop_name == "NeededExpProperty":
-            needed_experience_for_level_up = prop.neededExperienceForLevelUp
-        elif prop_name == "LevelProperty":
-            level = prop.level
-        elif prop_name == "IntelligenceAttribute":
-            intelligence = prop.intelligence
-        elif prop_name == "ManaProperties":
-            mana = prop.mana
-        elif prop_name == "UnarmedDamageProperties":
-            unarmed_damage = prop.unarmed_damage
-        elif prop_name == "DefenceProperties":
-            defence = prop.defence
-        elif prop_name == "ManaDefenceProperties":
-            mana_defence = prop.manaDefence
-        elif prop_name == "ManaDamageProperties":
-            mana_damage = prop.manaDamage
 
+    initial_position = None
+    for region in game_world.regions:
+        if region.name == player_def.position.name:
+            initial_position = region
+            break
+    player = Player(player_def.name, initial_position, player_def.vigor, player_def.endurance, player_def.strength, player_def.intelligence,
+                    player_def.health, player_def.mana, player_def.damage, player_def.defence, player_def.manaDamage, player_def.manaDefence)
 
-    player = Player(player_def.name, starting_position)
-    player.health = health
-    player.initial_health = health
-    player.unmodified_health = health
-
-    player.mana = mana
-    player.unmodified_mana = mana
-
-    player.damage = unarmed_damage
-    player.unmodified_damage = unarmed_damage
-
-    player.defence = defence
-    player.unmodified_defence = defence
-
-    player.mana_damage = mana_damage
-    player.unmodified_mana_damage = mana_damage
-
-    player.mana_defence = mana_defence
-    player.unmodified_mana_defence = mana_defence
-
-    player.current_experience = current_experience
-    player.needed_experience_for_level_up = needed_experience_for_level_up
-    player.level = level
-    player.inventory = inventory
-
-    player.vigor = vigor
-    player.strength = strength
-    player.endurance = endurance
-    player.intelligence = intelligence
-
+    player.current_experience = player_def.currentExperience
+    player.needed_experience_for_level_up = player_def.neededExperienceForLevelUp
+    player.level = player_def.level
+    player.inventory = [item.name for item in player_def.inventory]
     player.can_equip = player_def.canEquip
-
-    properties(player, player_def)
     game_world.player = player
 
     # Create enemies
     for enemy_def in model.enemies:
-        enemy = Enemy()
-        enemy.name = enemy_def.name.replace("_", " ")
-        properties(enemy, enemy_def)
+        enemy = Enemy(enemy_def.name.replace("_", " "), enemy_def.portrayal, enemy_def.position, enemy_def.health, enemy_def.mana, enemy_def.xp)
         for attack in enemy_def.attackTypes:
             enemy.attacks.append({
                 'name': attack.name,
@@ -182,6 +111,8 @@ def parse_dsl():
         enemy.healing_chance = enemy_def.healingChance
         enemy.healing_amount = enemy_def.healingAmount
         enemy.healing_amount_variance = enemy_def.healingAmountVariance
+        for item in enemy_def.inventory:
+            enemy.items_to_drop[item.name] = item
         game_world.enemies.append(enemy)
 
     # Set start and final positions
@@ -203,51 +134,3 @@ def parse_dsl():
         game_world.settings = settings
 
     return game_world
-
-
-def properties(obj, obj_def):
-    for prop in obj_def.properties:
-        prop_name = prop.__class__.__name__
-        prop_value = None
-        if prop_name == "PortrayalProperties":
-            prop_value = prop.portrayal
-        elif prop_name == "ContainsProperties":
-            prop_value = []
-            for item in prop.contains:
-                prop_value.append(item.name)
-        elif prop_name == "PositionProperties":
-            prop_value = prop.position.name
-        elif prop_name == "ActivationProperties":
-            action_name = prop.action.__class__.__name__
-            if action_name == "HealAction":
-                prop_value = HealAction(action_name, prop.action.amount)
-        elif prop_name == "InventoryProperties":
-            prop_value = []
-            for item in prop.inventory:
-                prop_value.append(item.name)
-        elif prop_name == "HealthProperties":
-            prop_value = prop.health
-        elif prop_name == "ManaProperties":
-            prop_value = prop.mana
-        elif prop_name == "WeaponProperties":
-            prop_value = prop.damage
-        elif prop_name in ["WeaponsToDrop", "ArmorsToDrop", "ItemsToDrop"]:
-            prop_value = {}
-            for item in prop.inventory:
-                prop_value[item.name] = item
-
-        elif prop_name == "VigorAttribute":
-            prop_value = prop.vigor
-        elif prop_name == "StrengthAttribute":
-            prop_value = prop.strength
-        elif prop_name == "EnduranceAttribute":
-            prop_value = prop.endurance
-        elif prop_name == "Experience":
-            prop_value = prop.xp
-        elif prop_name == "IntelligenceAttribute":
-            prop_value = prop.intelligence
-        elif prop_name == "UnarmedDamageProperties":
-            prop_value = prop.unarmed_damage
-        elif prop_name == "DefenceProperties":
-            prop_value = prop.defence
-        obj.add_property(prop_name, prop_value)

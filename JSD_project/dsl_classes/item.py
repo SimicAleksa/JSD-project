@@ -1,18 +1,17 @@
 class Item:
-    def __init__(self, name, is_static):
+    def __init__(self, name, portrayal, is_static):
         self.name = name
-        self.properties = {}
+        self.portrayal = portrayal
+        self.contains = []
+        self.activations = []
         self.isStatic = is_static
 
-    def add_property(self, prop_name, prop_value):
-        self.properties[prop_name] = prop_value
-
     def print_self(self):
-        return f'{self.properties["PortrayalProperties"]}'
+        return f'{self.portrayal}'
 
     def print_self_contains(self):
         items = ""
-        for item in self.properties["ContainsProperties"]:
+        for item in self.contains:
             items += item + ", "
         items = items[:-2]
-        return f'{self.properties["PortrayalProperties"]}. Inside you see {items}'
+        return f'{self.portrayal}. Inside you see {items}'

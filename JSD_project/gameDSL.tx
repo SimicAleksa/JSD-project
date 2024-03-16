@@ -20,20 +20,28 @@ GeneralSettings:
 
 Region:
     'region' name = GWID '{'
-        properties *= RegionProperties
-        '::'
-        connections *= Connection[',']
-        '::'
-        ('requirements' requirements += Requirement[','])?
-        ('environmental_dmg' environmental_dmg = EnvironmentalDamage)?
+        (
+            'portrayal' portrayal = STRING
+            ('contains' contains *= [Containable][','])?
+            '::'
+            connections *= Connection[',']
+            '::'
+            ('requirements' requirements += Requirement[','])?
+            ('environmental_dmg' environmental_dmg = EnvironmentalDamage)?
+        )#
     '}'
 ;
 
 Enemy:
     'enemy' name = GWID '{'
         (
-            properties *= EnemyProperties
+            'portrayal' portrayal = STRING
+            'position' position = [Region]
+            'health' health = INT
+            ('mana' mana = INT)?
+            ('drops' '{' inventory *= [Containable][','] '}')?
             'attacks' '{' attackTypes += AttackType '}'
+            'xp' xp = INT
             ('healing' '{'
                 (
                     'chance' healingChance = FLOAT
@@ -66,7 +74,23 @@ Requirement:
 Player:
     'player' name = GWID '{'
         (
-            properties *= PlayerProperties
+            'portrayal' portrayal = STRING
+            'currentExperience' currentExperience = INT
+            'neededExperienceForLevelUp' neededExperienceForLevelUp = INT
+            'level' level = INT
+            'position' position = [Region]
+            'inventory' '{' inventory *= [Containable][','] '}'
+            ('vigor' vigor = INT)?
+            ('endurance' endurance = INT)?
+            ('strength' strength = INT)?
+            ('intelligence' intelligence = INT)?
+
+            'health' health = INT
+            ('mana' mana = INT)?
+            'damage' damage = INT
+            'defence' defence = INT
+            ('manaDamage' manaDamage = INT)?
+            ('manaDefence' manaDefence = INT)?
             'canEquip' '{' canEquip *= GWID[','] '}'
         )#
     '}'
@@ -104,14 +128,18 @@ Modifier:
 ;
 
 Modifiable:
-    'health' | 'mana' | 'damage' | 'defense' | 'manaDamage' | 'manaDefense'
+    'current_max_health' | 'mana' | 'damage' | 'defense' | 'mana_damage' | 'mana_defence'
 ;
 
 
 Item:
     'item' name = GWID '{'
-        properties *= ItemProperties
-        'isStatic' isStatic = BOOL
+        (
+            activations *= ActivationProperties
+            'portrayal' portrayal = STRING
+            ('contains' contains *= [Containable][','])?
+            'isStatic' isStatic = BOOL
+        )#
     '}'
 ;
 
@@ -120,69 +148,8 @@ Connection:
     direction = Direction '->' target = GWID
 ;
 
-RegionProperties:
-    BasicProperties | ContainsProperties
-;
-
-ContainsProperties:
-    'contains' contains *= [Containable][',']
-;
-
 Containable:
     Item | Weapon | Armor
-;
-
-EnemyProperties:
-    BasicProperties | PositionProperties | HealthProperties | ItemsToDrop | WeaponsToDrop | ArmorsToDrop | Experience | ManaProperties
-;
-
-PlayerProperties:
-    BasicProperties | MovementProperties | PositionProperties | InventoryProperties | AttributeProperties |
-    LevelProperties | BasicStatProperties | ManaDefenceProperties | ManaDamageProperties
-;
-
-BasicStatProperties:
-    ManaProperties | HealthProperties | UnarmedDamageProperties | DefenceProperties
-;
-
-AttributeProperties:
-    VigorAttribute | EnduranceAttribute | StrengthAttribute | IntelligenceAttribute
-;
-
-BasicProperties:
-    PortrayalProperties
-;
-
-InventoryProperties:
-    'inventory' '{' inventory *= [Item][','] '}'
-;
-
-LevelProperties:
-    CurrentExpProperty | NeededExpProperty | LevelProperty
-;
-
-CurrentExpProperty:
-    'currentExperience' currentExperience = INT
-;
-
-NeededExpProperty:
-    'neededExperienceForLevelUp' neededExperienceForLevelUp = INT
-;
-
-LevelProperty:
-    'level' level = INT
-;
-
-Experience:
-    'xp' xp = INT
-;
-
-ItemProperties:
-    BasicProperties | ActivationProperties | ContainsProperties
-;
-
-WeaponProperties:
-    'damage' damage = INT
 ;
 
 ActivationProperties:
@@ -190,79 +157,19 @@ ActivationProperties:
 ;
 
 ActivationAction:
-    HealAction | AttackAction
+    RestoreHealthAction | RestoreManaAction
 ;
 
-HealAction:
+RestoreHealthAction:
     'heal' amount = INT
 ;
 
-AttackAction:
-    'attack' amount = INT
+RestoreManaAction:
+    'restoreMana' amount = INT
 ;
 
 EnvironmentalDamage:
     'damage' amount = INT
-;
-
-PortrayalProperties:
-    'portrayal' portrayal = STRING
-;
-
-ItemsToDrop:
-    'drops' '{' inventory *= [Item][','] '}'
-;
-
-WeaponsToDrop:
-    'dropsWeapon' '{' inventory *= [Weapon][','] '}'
-;
-
-ArmorsToDrop:
-    'dropsArmor' '{' inventory *= [Armor][','] '}'
-;
-
-PositionProperties:
-    'position' position = [Region]
-;
-
-HealthProperties:
-    'health' health = INT
-;
-
-ManaProperties:
-    'mana' mana = INT
-;
-
-UnarmedDamageProperties:
-    'damage' unarmed_damage = INT
-;
-
-DefenceProperties:
-    'defence' defence = INT
-;
-
-ManaDefenceProperties:
-    'manaDefence' manaDefence = INT
-;
-
-ManaDamageProperties:
-    'manaDamage' manaDamage = INT
-;
-
-VigorAttribute:
-    'vigor' vigor = INT
-;
-
-EnduranceAttribute:
-    'endurance' endurance = INT
-;
-
-StrengthAttribute:
-    'strength' strength = INT
-;
-
-IntelligenceAttribute:
-    'intelligence' intelligence = INT
 ;
 
 MovementProperties:

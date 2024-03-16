@@ -1,9 +1,9 @@
 class Region:
-    def __init__(self, name):
+    def __init__(self, name, portrayal):
         self.name = name
+        self.portrayal = portrayal
         self.items = {}
         self.connections = {}
-        self.properties = {}
         self.requirements = []
         self.environmental_dmg = None
 
@@ -13,8 +13,8 @@ class Region:
     def add_environmental_dmg(self, environmental_dmg):
         self.environmental_dmg = environmental_dmg
 
-    def add_property(self, prop_name, prop_value):
-        self.properties[prop_name] = prop_value
+    def add_item(self, item):
+        self.items[item.name] = item
 
     def remove_item(self, item):
         del self.items[item]
@@ -30,7 +30,7 @@ class Region:
         for item in self.items:
             items += item + ", "
         items = items[:-2]
-        text = f"You are in {self.properties['PortrayalProperties']}. "
+        text = f"You are in {self.portrayal}. "
         if items:
             text += f"Inside you see {items}. "
         return text

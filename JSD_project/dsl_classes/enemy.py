@@ -2,71 +2,64 @@ import numpy as np
 
 
 class Enemy:
-    def __init__(self):
-        self.name = ""
-        self.position = ""  # Region object
-        self.initial_health = 0
-        self.damage = 0
-        self.mana_damage = 0
-        self.properties = {}
+    def __init__(self, name, portrayal, position, health, mana, xp):
+        self.name = name
+        self.portrayal = portrayal
+        self.position = position
+        self.health = health
+        self.initial_health = health
+
+        self.mana = mana
+        self.initial_mana = mana
+        self.xp = xp
+
         self.items_to_drop = {}
-        self.weapons_to_drop = {}
         self.attacks = []
+
         self.healing_chance = 0
         self.healing_amount = 0
         self.healing_amount_variance = 0
 
     def get_xp_value(self):
-        return self.properties['Experience']
+        return self.xp
 
     def get_position(self):
-        return self.properties['PositionProperties']
+        return self.position
 
     def set_position_none(self):
-        self.properties['PositionProperties'] = None
+        self.position = None
 
     def get_description(self):
-        return self.properties['PortrayalProperties']
+        return self.portrayal
 
     def get_health(self):
-        return self.properties['HealthProperties']
+        return self.health
 
     def get_mana(self):
-        if 'ManaProperties' not in self.properties:
-            return 0
-        return self.properties['ManaProperties']
+        return self.mana
 
     def set_health(self, value):
-        self.properties['HealthProperties'] = value
+        self.health = value
 
     def set_mana(self, value):
-        self.properties['ManaProperties'] = value
+        self.mana = value
 
     def reduce_health(self, value):
-        self.properties['HealthProperties'] -= value
+        self.health -= value
 
     def reduce_mana(self, value):
-        self.properties['ManaProperties'] -= value
+        self.mana -= value
 
     def heal(self, value):
-        self.properties['HealthProperties'] = min(self.initial_health, self.properties['HealthProperties'] + value)
+        self.health = min(self.initial_health, self.health + value)
 
     def reset_health(self):
         self.set_health(self.initial_health)
 
-    def add_property(self, prop_name, prop_value):
-        self.properties[prop_name] = prop_value
-        if prop_name == 'HealthProperties':
-            self.initial_health = self.get_health()
-
     def get_droppable(self):
         result = []
-        for i in self.properties['ItemsToDrop']:
-            result.append(self.properties['ItemsToDrop'][i])
-        for w in self.properties['WeaponsToDrop']:
-            result.append(self.properties['WeaponsToDrop'][w])
-        for a in self.properties['ArmorsToDrop']:
-            result.append(self.properties['ArmorsToDrop'][a])
+        for i in self.items_to_drop:
+            result.append(self.items_to_drop[i])
         return result
 
     def choose_attack(self):

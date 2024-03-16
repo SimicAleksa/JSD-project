@@ -1,10 +1,14 @@
 class HealAction:
-    def __init__(self, name, amount):
-        self.name = name
+    def __init__(self, amount):
         self.amount = amount
 
+    def activate(self, player):
+        player.heal(self.amount)
 
-class AttackAction:
-    def __init__(self, name, amount):
-        self.name = name
+
+class RestoreManaAction:
+    def __init__(self, amount):
         self.amount = amount
+
+    def activate(self, player):
+        player.restore_mana(self.amount)
