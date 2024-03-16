@@ -173,6 +173,7 @@ class Player:
 
         self.weapon = None
         self.armor = None
+        self.can_equip = []
 
         # attributes
         self.vigor = 10
@@ -328,10 +329,10 @@ class Player:
                     return "You cant do that"
             if item in game_world.weapons:
                 self.take_weapon(item, game_world)
-                return f"You picked up {item}. You can now equip it."
+                return f"You picked up {item}. You might be able to equip it."
             if item in game_world.armors:
                 self.take_armor(item, game_world)
-                return f"You picked up {item}. You can now equip it."
+                return f"You picked up {item}. You might be able to equip it."
         else:
             return "That item is not present in this room"
 
@@ -339,21 +340,38 @@ class Player:
         if item in self.inventory:
             text = ""
             if item in game_world.weapons:
-                if self.weapon is not None:
-                    self.remove_stat_modifications(self.weapon)
-                self.weapon = game_world.weapons[item]
-                self.apply_stat_modifications(self.weapon)
-                text = f"You equipped {item}. It deals additional {self.weapon.attack_damage} damage."
+                if self.level >= game_world.weapons[item].required_level and game_world.weapons[item].type in self.can_equip:
+                    if self.weapon is not None:
+                        self.remove_stat_modifications(self.weapon)
+                    self.weapon = game_world.weapons[item]
+                    self.apply_stat_modifications(self.weapon)
+                    text = f"You equipped {item}. It deals additional {self.weapon.attack_damage} damage."
+                else:
+                    text = "You cannot equip this."
             elif item in game_world.armors:
-                if self.armor is not None:
-                    self.remove_stat_modifications(self.armor)
-                self.armor = game_world.armors[item]
-                self.apply_stat_modifications(self.armor)
-                text = f"You equipped {item}. It gives additional {self.armor.defense} defense."
+                if self.level >= game_world.armors[item].required_level and game_world.armors[item].type in self.can_equip:
+                    if self.armor is not None:
+                        self.remove_stat_modifications(self.armor)
+                    self.armor = game_world.armors[item]
+                    self.apply_stat_modifications(self.armor)
+                    text = f"You equipped {item}. It gives additional {self.armor.defense} defense."
+                else:
+                    text = "You cannot equip this."
             if game_world.current_enemy is not None and not game_world.settings.additional_turn_after_use:
                 text += "\n" + game_world.attack_player()
             return text
         return f"You don't have that item {item}"
+
+    def unequip(self, item, _game_world):
+        if self.weapon is not None and item == self.weapon.name:
+            self.remove_stat_modifications(self.weapon)
+            self.weapon = None
+            return f"You unequipped {item}"
+        elif self.armor is not None and item == self.armor.name:
+            self.remove_stat_modifications(self.armor)
+            self.armor = None
+            return f"You unequipped {item}"
+        return f"{item} is not equipped"
 
 
     def take_weapon(self, weapon, game_world):
@@ -553,8 +571,9 @@ class Enemy:
 
 
 class Weapon:
-    def __init__(self, name, health_damage, health_cost, mana_cost, required_level):
+    def __init__(self, name, weaponType, health_damage, health_cost, mana_cost, required_level):
         self.name = name
+        self.type = weaponType
         self.health_damage = health_damage
         self.health_cost = health_cost
         self.mana_cost = mana_cost
@@ -566,8 +585,9 @@ class Weapon:
 
 
 class Armor:
-    def __init__(self, name, defense, required_level):
+    def __init__(self, name, armorType, defense, required_level):
         self.name = name
+        self.type = armorType
         self.defense = defense
         self.required_level = required_level
         self.modifiers = {}

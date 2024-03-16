@@ -41,6 +41,7 @@ def parse_dsl():
     for weapon_def in model.weapons:
         weapon = Weapon(
             weapon_def.name,
+            weapon_def.type,
             weapon_def.healthDamage,
             weapon_def.healthCost,
             weapon_def.manaCost,
@@ -55,6 +56,7 @@ def parse_dsl():
     for armor_def in model.armors:
         armor = Armor(
             armor_def.name,
+            armor_def.type,
             armor_def.defense,
             armor_def.requiredLevel
         )
@@ -134,6 +136,8 @@ def parse_dsl():
     player.strength = strength
     player.endurance = endurance
     player.intelligence = intelligence
+
+    player.can_equip = player_def.canEquip
 
     properties(player, player_def)
     game_world.player = player

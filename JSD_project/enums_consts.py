@@ -14,6 +14,8 @@ POSSIBLE_COMMANDS = [
     "open <item>",
     "take <item>",
     "use <item>",
+    "equip <item>",
+    "unequip <item>",
     "inventory",
     "health",
     "attack",
