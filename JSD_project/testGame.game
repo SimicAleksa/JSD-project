@@ -19,16 +19,25 @@ region hallway {
 region kitchen {
     portrayal "the spooky kitchen"
     ::
-    N -> backyard,
+    N -> mamas_basement,
     S -> hallway
     ::
     requirements key
 }
 
+region mamas_basement{
+    portrayal "the basement! Mamas favorite!"
+    ::
+    N -> backyard,
+    S -> kitchen
+    ::
+}
+
+
 region backyard {
     portrayal "the backyard! Congratulations, you won!"
     ::
-    S -> kitchen
+    S -> mamas_basement
     ::
 }
 
@@ -69,7 +78,7 @@ player adventurer {
     portrayal "You are an intrepid adventurer."
     position entryway
     inventory {
-        twix
+        mars
     }
     intelligence 5
     vigor 10

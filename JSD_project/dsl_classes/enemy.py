@@ -63,7 +63,10 @@ class Enemy:
         return result
 
     def choose_attack(self):
-        feasible_attacks = [attack for attack in self.attacks if attack.health_cost < self.get_health() and attack.mana_cost <= self.get_mana()]
+        feasible_attacks = []
+        for attack in self.attacks:
+            if attack["health_cost"] < self.get_health() and attack["mana_cost"] <= self.get_mana():
+                feasible_attacks.append(attack)
         # TODO: handle case when no feasible attacks
         if len(feasible_attacks) == 1:
             return feasible_attacks[0]

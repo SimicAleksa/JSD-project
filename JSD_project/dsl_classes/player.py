@@ -2,7 +2,8 @@ import numpy as np
 
 
 class Player:
-    def __init__(self, name, start_position, vigor, endurance, strength, intelligence, health, mana, damage, defence, mana_damage, mana_defence):
+    def __init__(self, name, start_position, vigor, endurance, strength, intelligence, health, mana, damage, defence,
+                 mana_damage, mana_defence):
         self.name = name
         self.position = start_position
         self.inventory = []
@@ -74,7 +75,8 @@ class Player:
             return self.armor.mana_defense * (1 + self.mana_defence / 100)
 
     def print_stats(self):
-        print(f"Current stats:\nVigor - {self.vigor}\nEndurance - {self.endurance}\nStrength - {self.strength}\nIntelligence - {self.intelligence}")
+        print(
+            f"Current stats:\nVigor - {self.vigor}\nEndurance - {self.endurance}\nStrength - {self.strength}\nIntelligence - {self.intelligence}")
 
     def inc_stat(self, stat):
         if stat == "vigor":
@@ -164,6 +166,8 @@ class Player:
         # TODO
         pass
 
+    def get_mana(self):
+        return self.mana
 
     def set_mana(self, value):
         self.mana = value
@@ -228,7 +232,8 @@ class Player:
         if item in self.inventory:
             text = ""
             if item in game_world.weapons:
-                if self.level >= game_world.weapons[item].required_level and game_world.weapons[item].type in self.can_equip:
+                if self.level >= game_world.weapons[item].required_level and game_world.weapons[
+                    item].type in self.can_equip:
                     if self.weapon is not None:
                         self.remove_stat_modifications(self.weapon)
                     self.weapon = game_world.weapons[item]
@@ -237,7 +242,8 @@ class Player:
                 else:
                     text = "You cannot equip this."
             elif item in game_world.armors:
-                if self.level >= game_world.armors[item].required_level and game_world.armors[item].type in self.can_equip:
+                if self.level >= game_world.armors[item].required_level and game_world.armors[
+                    item].type in self.can_equip:
                     if self.armor is not None:
                         self.remove_stat_modifications(self.armor)
                     self.armor = game_world.armors[item]
@@ -260,7 +266,6 @@ class Player:
             self.armor = None
             return f"You unequipped {item}"
         return f"{item} is not equipped"
-
 
     def take_weapon(self, weapon, game_world):
         self.inventory.append(weapon)
