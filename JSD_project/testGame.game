@@ -8,7 +8,7 @@ region entryway {
 
 region hallway {
     portrayal "a dimly lit hallway"
-    contains key, flashlight, chest, katana
+    contains chest, katana
     ::
     N -> kitchen,
     S -> entryway
@@ -22,7 +22,7 @@ region kitchen {
     N -> backyard,
     S -> hallway
     ::
-    requirements key,flashlight
+    requirements key
 }
 
 region backyard {

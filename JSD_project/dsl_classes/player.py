@@ -338,7 +338,7 @@ class Player:
                 if len(game_world_item.activations) == 0:
                     return "That item can't be used"
                 for action in game_world_item.activations:
-                    action.activate()
+                    action.activate(self)
                 self.inventory.remove(item)
                 text = "You used " + item + ". Your health is now " + str(self.health)
             if game_world.current_enemy is not None and not game_world.settings.additional_turn_after_use:
