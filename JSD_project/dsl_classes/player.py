@@ -17,6 +17,7 @@ class Player:
 
         self.current_experience = 0
         self.needed_experience_for_level_up = 100
+        self.levelScalingPercentage = 10
         self.level = 1
         self.level_points = 0
 
@@ -150,7 +151,7 @@ class Player:
                 self.current_experience -= self.needed_experience_for_level_up
                 self.level += 1
                 self.level_points += 1
-                self.needed_experience_for_level_up *= 1.1
+                self.needed_experience_for_level_up *= (1+(self.levelScalingPercentage/100))
                 print(f"You leveled up to: {self.level} level.")
             print(f"You have {self.level_points} points to use")
 

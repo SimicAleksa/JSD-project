@@ -74,6 +74,7 @@ item flashlight {
 player adventurer {
     currentExperience 0
     neededExperienceForLevelUp 20
+    levelScalingPercentage 50000
     level 1
     portrayal "You are an intrepid adventurer."
     position entryway

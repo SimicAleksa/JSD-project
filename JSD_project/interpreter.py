@@ -89,6 +89,7 @@ def parse_dsl():
 
     player.current_experience = player_def.currentExperience
     player.needed_experience_for_level_up = player_def.neededExperienceForLevelUp
+    player.levelScalingPercentage = player_def.levelScalingPercentage
     player.level = player_def.level
     player.inventory = [item.name for item in player_def.inventory]
     player.can_equip = player_def.canEquip
