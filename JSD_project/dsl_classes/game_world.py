@@ -18,9 +18,10 @@ class GameWorld:
 
     def check_combat(self, region):
         for enemy in self.enemies:
-            if enemy.get_position().name == region.name:
-                self.current_enemy = enemy
-                return True
+            if enemy.get_position() is not None:
+                if enemy.get_position().name == region.name:
+                    self.current_enemy = enemy
+                    return True
         return False
 
     def set_start_position(self, region):
@@ -30,10 +31,13 @@ class GameWorld:
         self.final_position = region
 
     def flee(self):
-        print("You fled!")
-        self.current_enemy = None
-        self.player.move(self.opposite_dirs[self.prev_direction], self)
-        print(self.player.print_self())
+        if self.current_enemy is not None:
+            print("You fled!")
+            self.current_enemy = None
+            self.player.move(self.opposite_dirs[self.prev_direction], self)
+            print(self.player.print_self())
+        else:
+            print("No reason to flee you coward!!!")
 
     def attack_enemy(self):
         damage = int(self.player.strike_damage() * uniform(0.7, 1.3))
@@ -48,6 +52,7 @@ class GameWorld:
             self.player.mana -= self.player.weapon.mana_cost
             self.player.health -= self.player.weapon.health_cost
         print(f"You dealt {damage} damage. Enemy has {self.current_enemy.get_health()} health.")
+        print(f"You have {self.player.mana} mana left.")
         # TODO: print mana stats
         if enemy_health == 0:
             print(f"You beat {self.current_enemy.name}!")
