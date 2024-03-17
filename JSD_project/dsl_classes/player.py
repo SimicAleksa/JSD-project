@@ -22,6 +22,7 @@ class Player:
 
         self.base_health = health
         self.mana = mana
+        self.current_max_mana = mana
         self.base_mana = mana
         self.unmodified_mana = mana
 
@@ -163,8 +164,7 @@ class Player:
         self.health = min(self.current_max_health, self.health + value)
 
     def restore_mana(self, value):
-        # TODO
-        pass
+        self.mana = min(self.current_max_mana, self.mana + value)
 
     def get_mana(self):
         return self.mana
