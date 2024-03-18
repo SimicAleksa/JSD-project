@@ -78,7 +78,9 @@ class Player:
 
     def print_stats(self):
         print(
-            f"Current stats:\nVigor - {self.vigor}\nEndurance - {self.endurance}\nStrength - {self.strength}\nIntelligence - {self.intelligence}")
+            f"Current stats:\nVigor - {self.vigor}\nEndurance - {self.endurance}\nStrength - {self.strength}\nIntelligence - {self.intelligence}"
+            f"\nHealth - {self.health}\nDefence - {self.defence}\nDamage - {self.damage}\nMana - {self.mana}"
+            f"\nMana damage - {self.mana_damage} \nMana defence - {self.mana_defence}\nMax health - {self.current_max_health}\nMax mana - {self.current_max_mana}")
 
     def inc_stat(self, stat):
         if stat == "vigor":
@@ -102,8 +104,11 @@ class Player:
             return "You don't have enough level up points for this command!"
 
     def scale_health_from_vigor(self):
-        self.current_max_health = self.base_health * (1 + self.vigor / 100)
+        stat_modified = self.current_max_health != self.unmodified_current_max_health
+        self.current_max_health = int(self.base_health * (1 + self.vigor / 100))
         self.unmodified_current_max_health = self.current_max_health
+        if stat_modified:
+            self.reapply_modification_single_stat('current_max_health')
 
     def inc_strength(self):
         if self.level_points >= 1:
@@ -115,8 +120,11 @@ class Player:
             return "You don't have enough level up points for this command!"
 
     def scale_damage_from_strength(self):
+        stat_modified = self.damage != self.unmodified_damage
         self.damage *= (1 + self.strength / 100)
         self.unmodified_damage = self.damage
+        if stat_modified:
+            self.reapply_modification_single_stat('damage')
 
     def inc_endurance(self):
         if self.level_points >= 1:
@@ -128,8 +136,11 @@ class Player:
             return "You don't have enough level up points for this command!"
 
     def scale_defence_from_endurance(self):
+        stat_modified = self.defence != self.unmodified_defence
         self.defence *= (1 + self.endurance / 100)
         self.unmodified_defence = self.defence
+        if stat_modified:
+            self.reapply_modification_single_stat('defence')
 
     def inc_intelligence(self):
         if self.level_points >= 1:
@@ -141,8 +152,11 @@ class Player:
             return "You don't have enough level up points for this command!"
 
     def scale_mana_from_intelligence(self):
+        stat_modified = self.mana != self.unmodified_mana
         self.mana = self.base_mana * (1 + self.intelligence / 100)
         self.unmodified_mana = self.mana
+        if stat_modified:
+            self.reapply_modification_single_stat('mana')
 
     def monster_slain(self, current_enemy):
         self.current_experience += current_enemy.get_xp_value()
@@ -151,7 +165,7 @@ class Player:
                 self.current_experience -= self.needed_experience_for_level_up
                 self.level += 1
                 self.level_points += 1
-                self.needed_experience_for_level_up *= (1+(self.levelScalingPercentage/100))
+                self.needed_experience_for_level_up *= (1 + (self.levelScalingPercentage / 100))
                 print(f"You leveled up to: {self.level} level.")
             print(f"You have {self.level_points} points to use")
 
@@ -233,8 +247,7 @@ class Player:
         if item in self.inventory:
             text = ""
             if item in game_world.weapons:
-                if self.level >= game_world.weapons[item].required_level and game_world.weapons[
-                    item].type in self.can_equip:
+                if self.level >= game_world.weapons[item].required_level and game_world.weapons[item].type in self.can_equip:
                     if self.weapon is not None:
                         self.remove_stat_modifications(self.weapon)
                     self.weapon = game_world.weapons[item]
@@ -243,8 +256,7 @@ class Player:
                 else:
                     text = "You cannot equip this."
             elif item in game_world.armors:
-                if self.level >= game_world.armors[item].required_level and game_world.armors[
-                    item].type in self.can_equip:
+                if self.level >= game_world.armors[item].required_level and game_world.armors[item].type in self.can_equip:
                     if self.armor is not None:
                         self.remove_stat_modifications(self.armor)
                     self.armor = game_world.armors[item]
@@ -287,6 +299,14 @@ class Player:
     def apply_stat_modifications(self, item):
         for property_to_modify, coefficients in item.modifiers.items():
             modified_value = np.polyval(coefficients, getattr(self, property_to_modify))
+            setattr(self, property_to_modify, modified_value)
+
+    def reapply_modification_single_stat(self, property_to_modify):
+        if self.weapon is not None and property_to_modify in self.weapon.modifiers:
+            modified_value = np.polyval(self.weapon.modifiers[property_to_modify], getattr(self, property_to_modify))
+            setattr(self, property_to_modify, modified_value)
+        if self.armor is not None and property_to_modify in self.armor.modifiers:
+            modified_value = np.polyval(self.armor.modifiers[property_to_modify], getattr(self, property_to_modify))
             setattr(self, property_to_modify, modified_value)
 
     def remove_stat_modifications(self, item):
