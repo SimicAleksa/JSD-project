@@ -17,7 +17,7 @@ def parse_dsl():
     dsl_mm = metamodel_from_file(join(this_folder, "gameDSL.tx"))
 
     # Parse the DSL file and create the GameWorld
-    model = dsl_mm.model_from_file(join(this_folder,"testGame.game"))
+    model = dsl_mm.model_from_file(join(this_folder, "testGame.game"))
 
     game_world = GameWorld()
 
@@ -127,13 +127,7 @@ def parse_dsl():
 
     # Set settings
     for settings_def in model.settings:
-        settings = GeneralSettings()
-        if settings_def.additionalTurnAfterUse:
-            settings.set_additional_turn_after_use(True)
-        if settings_def.dropOldWeapon:
-            settings.set_drop_old_weapon(True)
-        if settings_def.dropOldArmor:
-            settings.set_drop_old_armor(True)
+        settings = GeneralSettings(settings_def.dropOtherWeapons, settings_def.dropOtherArmors, settings_def.additionalTurnAfterUse)
         game_world.settings = settings
 
     return game_world

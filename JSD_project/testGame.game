@@ -132,10 +132,18 @@ weapon katana {
     type sword
     healthDamage 10
     modifiers {
-        modifies current_max_health
-        coefficients 10,43
-        modifies damage
-        coefficients 100,5,2
+        modifier {
+            modifies current_max_health
+            coefficients 10,43
+        }
+        modifier {
+            modifies damage
+            coefficients 0.5,5,2
+        }
+        modifier {
+            modifies mana_defence
+            coefficients 25
+        }
     }
 }
 
@@ -154,8 +162,8 @@ armor shield {
     defense 30
 }
 
-*settings* {
-    dropOldWeapon False
+settings {
+    dropOtherWeapons True
     additionalTurnAfterUse False
 }
 

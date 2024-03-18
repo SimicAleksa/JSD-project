@@ -16,7 +16,12 @@ class Weapon:
         self.modifiers[attr_name] = coefficients
 
     def print_with_modifiers(self, player):
-        text = f'{self.portrayal}'
+        text = f'{self.portrayal}\nType: {self.type}\nAdditional health damage: {self.health_damage}\nAdditional mana damage: {self.mana_damage}'
+        if self.health_cost > 0:
+            text += f'\nReduces health by {self.health_cost} when used.'
+        if self.mana_cost > 0:
+            text += f'\nReduces mana by {self.mana_cost} when used.'
         for stat, coefficients in self.modifiers.items():
-            text += f'\nModifies {stat}: {player.__getattribute__(stat)} -> {np.polyval(coefficients, player.__getattribute__(stat))}'
+            stat_str = stat.replace('_', ' ')
+            text += f'\nModifies {stat_str}: {player.__getattribute__(stat)} -> {np.polyval(coefficients, player.__getattribute__(stat))}'
         return text

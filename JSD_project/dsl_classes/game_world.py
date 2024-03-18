@@ -51,9 +51,11 @@ class GameWorld:
         if self.player.weapon is not None:
             self.player.mana -= self.player.weapon.mana_cost
             self.player.health -= self.player.weapon.health_cost
+            if self.player.weapon.mana_cost > 0:
+                print(f"You have {self.player.mana} mana left")
+            if self.player.weapon.health_cost > 0:
+                print(f"You have {self.player.health} health left")
         print(f"You dealt {damage} damage. Enemy has {self.current_enemy.get_health()} health.")
-        print(f"You have {self.player.mana} mana left.")
-        # TODO: print mana stats
         if enemy_health == 0:
             print(f"You beat {self.current_enemy.name}!")
             self.current_enemy.set_position_none()

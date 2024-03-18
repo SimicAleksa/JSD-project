@@ -24,8 +24,8 @@ class Player:
         self.base_health = health
         self.mana = mana
         self.current_max_mana = mana
+        self.unmodified_current_max_mana = mana
         self.base_mana = mana
-        self.unmodified_mana = mana
 
         self.damage = damage
         self.unmodified_damage = damage
@@ -152,11 +152,11 @@ class Player:
             return "You don't have enough level up points for this command!"
 
     def scale_mana_from_intelligence(self):
-        stat_modified = self.mana != self.unmodified_mana
-        self.mana = self.base_mana * (1 + self.intelligence / 100)
-        self.unmodified_mana = self.mana
+        stat_modified = self.current_max_mana != self.unmodified_current_max_mana
+        self.current_max_mana = self.base_mana * (1 + self.intelligence / 100)
+        self.unmodified_current_max_mana = self.current_max_mana
         if stat_modified:
-            self.reapply_modification_single_stat('mana')
+            self.reapply_modification_single_stat('current_max_mana')
 
     def monster_slain(self, current_enemy):
         self.current_experience += current_enemy.get_xp_value()
@@ -186,11 +186,8 @@ class Player:
 
     def set_mana(self, value):
         self.mana = value
-        self.unmodified_mana = value
 
     def move(self, direction, game_world):
-        if game_world.current_enemy is not None:
-            return "You shall not pass", False
         if direction in self.position.connections:
             target_room = self.position.connections[direction]
             for region in game_world.regions:
@@ -236,10 +233,14 @@ class Player:
                     return "You cant do that"
             if item in game_world.weapons:
                 self.take_weapon(item, game_world)
-                return f"You picked up {item}. You might be able to equip it."
+                if self.can_equip_item(game_world.weapons[item]):
+                    return f"You picked up {item}. You can equip it."
+                return f"You picked up {item}. {self.get_reason_cannot_equip(game_world.weapons[item])}"
             if item in game_world.armors:
                 self.take_armor(item, game_world)
-                return f"You picked up {item}. You might be able to equip it."
+                if self.can_equip_item(game_world.armors[item]):
+                    return f"You picked up {item}. You can equip it."
+                return f"You picked up {item}. {self.get_reason_cannot_equip(game_world.armors[item])}"
         else:
             return "That item is not present in this room"
 
@@ -247,7 +248,7 @@ class Player:
         if item in self.inventory:
             text = ""
             if item in game_world.weapons:
-                if self.level >= game_world.weapons[item].required_level and game_world.weapons[item].type in self.can_equip:
+                if self.can_equip_item(game_world.weapons[item]):
                     if self.weapon is not None:
                         self.remove_stat_modifications(self.weapon)
                     self.weapon = game_world.weapons[item]
@@ -256,7 +257,7 @@ class Player:
                 else:
                     text = "You cannot equip this."
             elif item in game_world.armors:
-                if self.level >= game_world.armors[item].required_level and game_world.armors[item].type in self.can_equip:
+                if self.can_equip_item(game_world.armors[item]):
                     if self.armor is not None:
                         self.remove_stat_modifications(self.armor)
                     self.armor = game_world.armors[item]
@@ -268,6 +269,15 @@ class Player:
                 text += "\n" + game_world.attack_player()
             return text
         return f"You don't have that item {item}"
+
+    def can_equip_item(self, item):
+        return self.level >= item.required_level and item.type in self.can_equip
+
+    def get_reason_cannot_equip(self, item):
+        if item.type not in self.can_equip:
+            return f'You cannot equip this type of item. You can only equip {", ".join(self.can_equip)}.'
+        if self.level < item.required_level:
+            return f'You need to be at least level {item.required_level} to equip this item.'
 
     def unequip(self, item, _game_world):
         if self.weapon is not None and item == self.weapon.name:
@@ -283,18 +293,22 @@ class Player:
     def take_weapon(self, weapon, game_world):
         self.inventory.append(weapon)
         self.remove_item(weapon)
-        if self.weapon is not None and game_world.settings.drop_old_weapon:
-            self._drop_old_weapon(self.weapon.name, game_world)
-        if self.weapon is not None:
-            self.remove_stat_modifications(self.weapon)
+        if game_world.settings.drop_other_weapons:
+            if self.weapon is not None:
+                self.remove_stat_modifications(self.weapon)
+                self.weapon = None
+            self._drop_other_weapons(weapon, game_world)
+
 
     def take_armor(self, armor, game_world):
         self.inventory.append(armor)
         self.remove_item(armor)
-        if self.armor is not None and game_world.settings.drop_old_armor:
-            self._drop_old_armor(self.armor.name, game_world)
-        if self.armor is not None:
-            self.remove_stat_modifications(self.armor)
+        if game_world.settings.drop_other_armors:
+            if self.armor is not None:
+                self.remove_stat_modifications(self.armor)
+                self.armor = None
+            self._drop_other_armors(armor, game_world)
+
 
     def apply_stat_modifications(self, item):
         for property_to_modify, coefficients in item.modifiers.items():
@@ -315,10 +329,18 @@ class Player:
             setattr(self, property_to_modify, original_value)
 
     def drop(self, item, game_world):
+        if (self.weapon is not None and self.weapon.name == item) or (self.armor is not None and self.armor.name == item):
+            self.unequip(item, game_world)
         if item in self.inventory:
             self.inventory.remove(item)
+            game_world_item = None
             if item in game_world.items:
                 game_world_item = game_world.items[item]
+            elif item in game_world.weapons:
+                game_world_item = game_world.weapons[item]
+            elif item in game_world.armors:
+                game_world_item = game_world.armors[item]
+            if game_world_item is not None:
                 self.position.items[item] = game_world_item
                 return "You dropped " + item + " in " + self.position.name
         return "You dont have that item"
@@ -340,21 +362,20 @@ class Player:
                 return f"Your possessions are in {region.name}"
         return ""
 
-    def _drop_old_weapon(self, item, game_world):
-        if item in self.inventory and item in game_world.weapons:
-            self.position.items[item] = game_world.weapons[item]
-            self.inventory.remove(item)
-            print("You dropped " + item + " in " + self.position.name)
-        else:
-            print("You don't have that item")
+    def _drop_other_weapons(self, item, game_world):
+        for weapon in game_world.weapons:
+            if weapon != item and weapon in self.inventory:
+                self.position.items[weapon] = game_world.weapons[weapon]
+                self.inventory.remove(weapon)
+                print("You dropped " + weapon + " in " + self.position.name)
 
-    def _drop_old_armor(self, item, game_world):
-        if item in self.inventory and item in game_world.armors:
-            self.position.items[item] = game_world.armors[item]
-            self.inventory.remove(item)
-            print("You dropped " + item + " in " + self.position.name)
-        else:
-            print("You don't have that item")
+
+    def _drop_other_armors(self, item, game_world):
+        for armor in game_world.armors:
+            if armor != item and armor in self.inventory:
+                self.position.items[armor] = game_world.armors[armor]
+                self.inventory.remove(armor)
+                print("You dropped " + armor + " in " + self.position.name)
 
     def use(self, item, game_world):
         if item in self.inventory:
@@ -404,7 +425,14 @@ class Player:
         inventory = inventory[:-2]
         if inventory == "":
             return f'{self.position.print_self()}Your backpack is empty.'
-        return f'Your backpack has {inventory}.'
+        equipped = ""
+        if self.weapon is not None and self.armor is not None:
+            equipped = f"{self.weapon.name} and {self.armor.name} equipped."
+        elif self.weapon is not None:
+            equipped = f"{self.weapon.name} equipped."
+        elif self.armor is not None:
+            equipped = f"{self.armor.name} equipped."
+        return f'Your backpack has {inventory}. {equipped.capitalize()}'
 
     def print_item_info(self, item_str, game_world):
         if item_str in self.inventory:
@@ -413,7 +441,7 @@ class Player:
                 return game_world.items[item_str].print_self_with_activations()
             if item_str in game_world.weapons:
                 item = game_world.weapons[item_str]
-            elif item in game_world.armors:
+            elif item_str in game_world.armors:
                 item = game_world.armors[item_str]
             if item is not None:
                 return item.print_with_modifiers(self)

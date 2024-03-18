@@ -11,10 +11,12 @@ GameWorld:
 ;
 
 GeneralSettings:
-    '*settings*' '{'
-        ('dropOldWeapon' dropOldWeapon = BOOL)?
-        ('dropOldArmor' dropOldArmor = BOOL)?
-        'additionalTurnAfterUse' additionalTurnAfterUse = BOOL?
+    'settings' '{'
+        (
+            ('dropOtherWeapons' dropOtherWeapons = BOOL)?
+            ('dropOtherArmors' dropOtherArmors = BOOL)?
+            'additionalTurnAfterUse' additionalTurnAfterUse = BOOL?
+        )#
     '}'
 ;
 
@@ -126,12 +128,14 @@ Armor:
 ;
 
 Modifier:
-    'modifies' modifiableAttribute = Modifiable
-    'coefficients' coefficients += INT[',']
+    'modifier {'
+        'modifies' modifiableAttribute = Modifiable
+        'coefficients' coefficients += FLOAT[',']
+    '}'
 ;
 
 Modifiable:
-    'current_max_health' | 'mana' | 'damage' | 'defense' | 'mana_damage' | 'mana_defence'
+    'current_max_health' | 'current_max_mana' | 'damage' | 'defence' | 'mana_damage' | 'mana_defence'
 ;
 
 

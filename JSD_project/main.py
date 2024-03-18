@@ -21,6 +21,9 @@ def process_command(command):
         if action in commands_mapping:
             text = ""
             if "move" in command:
+                if game_world.current_enemy is not None:
+                    print("You shall not pass")
+                    return
                 if command in DIRECTIONS:
                     text, moved = commands_mapping[action](arg, game_world)
                     if moved:
