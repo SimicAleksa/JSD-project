@@ -50,6 +50,7 @@ def parse_dsl():
     for weapon_def in model.weapons:
         weapon = Weapon(
             weapon_def.name,
+            weapon_def.portrayal,
             weapon_def.type,
             weapon_def.healthDamage,
             weapon_def.manaDamage,
@@ -66,6 +67,7 @@ def parse_dsl():
     for armor_def in model.armors:
         armor = Armor(
             armor_def.name,
+            armor_def.portrayal,
             armor_def.type,
             armor_def.defense,
             armor_def.manaDefense,

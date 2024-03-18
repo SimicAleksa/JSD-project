@@ -128,6 +128,7 @@ enemy young_dragon {
 }
 
 weapon katana {
+    portrayal "A very mighty sword"
     type sword
     healthDamage 10
     modifiers {
@@ -139,6 +140,7 @@ weapon katana {
 }
 
 weapon magic_wand {
+    portrayal "Mysterious magic wand"
     type magic
     requiredLevel 4
     manaCost 10
@@ -146,6 +148,7 @@ weapon magic_wand {
 }
 
 armor shield {
+    portrayal "Ugly shield"
     type wood
     requiredLevel 1
     defense 30

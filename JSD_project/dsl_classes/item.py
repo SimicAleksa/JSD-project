@@ -9,6 +9,17 @@ class Item:
     def print_self(self):
         return f'{self.portrayal}'
 
+    def print_self_with_activations(self):
+        restores_health = 'HealAction' in [action.__class__.__name__ for action in self.activations]
+        restores_mana = 'RestoreManaAction' in [action.__class__.__name__ for action in self.activations]
+        if restores_health and restores_mana:
+            return f'{self.portrayal} Restores health and mana.'
+        if restores_health:
+            return f'{self.portrayal} Restores health.'
+        if restores_mana:
+            return f'{self.portrayal} Restores mana.'
+        return f'{self.portrayal}'
+
     def print_self_contains(self):
         items = ""
         for item in self.contains:

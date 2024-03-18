@@ -406,6 +406,19 @@ class Player:
             return f'{self.position.print_self()}Your backpack is empty.'
         return f'Your backpack has {inventory}.'
 
+    def print_item_info(self, item_str, game_world):
+        if item_str in self.inventory:
+            item = None
+            if item_str in game_world.items:
+                return game_world.items[item_str].print_self_with_activations()
+            if item_str in game_world.weapons:
+                item = game_world.weapons[item_str]
+            elif item in game_world.armors:
+                item = game_world.armors[item_str]
+            if item is not None:
+                return item.print_with_modifiers(self)
+        return "You do not have this item"
+
     def print_health(self):
         return f'You have {self.health} health.'
 

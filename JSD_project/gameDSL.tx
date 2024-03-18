@@ -100,6 +100,7 @@ Player:
 Weapon:
     'weapon' name = GWID '{'
         (
+            'portrayal' portrayal = STRING
             'type' type = GWID
             'healthDamage' healthDamage = INT
             ('manaDamage' manaDamage = INT)?
@@ -114,6 +115,7 @@ Weapon:
 Armor:
     'armor' name = GWID '{'
         (
+            'portrayal' portrayal = STRING
             'type' type = GWID
             'defense' defense = INT
             ('manaDefense' manaDefense = INT)?

@@ -13,7 +13,8 @@ def process_command(command):
         "open": game_world.player.open,
         "inc": game_world.player.inc_stat,
         "equip": game_world.player.equip,
-        "unequip": game_world.player.unequip
+        "unequip": game_world.player.unequip,
+        "info": game_world.player.print_item_info
     }
     try:
         action, arg = command.split(" ", 1)
