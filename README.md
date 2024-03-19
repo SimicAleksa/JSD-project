@@ -15,7 +15,7 @@ Cilj ovog projekta je razvijanje jezika specifičnog za domen koji omogućava op
 
  - #### Modelovanje likova: 
 
-    Za igrača se može zadati njegov opis, te njegove osnovne osobine (zdravlje, mana, damage, defence, mana damage, mana defence). Pored osnovnih osobina kreator takođe može da zada i osobine kao što su _vigor_ (koji povećava inicijalno zdravlje), _strenght_ (koji povećava jačinu igrača) i _endurance_ (koji povećava otpornost) koje igrač može da povećava kroz sistem levelovanja. Zatim je moguće zadati igračev početni XP, level, XP potreban za prelazak na naredni level. Takođe je moguće postaviti neke stvari u igračev ranac i na kraju postaviti igrača u početnu regiju. Ako se ne zada neka od osobina podrazumevana vrednost te osobnine će biti dodeljena. Kreator može da definiše i kakve tipove oružja ili armora igrač može da koristi. 
+    Za igrača se može zadati njegov opis, te njegove osnovne osobine (zdravlje, mana, damage, defence, mana damage, mana defence). Pored osnovnih osobina kreator takođe može da zada i osobine kao što su _vigor_ (koji povećava inicijalno zdravlje), _strength_ (koji povećava jačinu igrača) i _endurance_ (koji povećava otpornost) koje igrač može da povećava kroz sistem levelovanja. Zatim je moguće zadati igračev početni XP, level, XP potreban za prelazak na naredni level. Takođe je moguće postaviti neke stvari u igračev ranac i na kraju postaviti igrača u početnu regiju. Ako se ne zada neka od osobina podrazumevana vrednost te osobnine će biti dodeljena. Kreator može da definiše i kakve tipove oružja ili armora igrač može da koristi. 
     
     
  Primer igrača je prikazan u sledećem isečku:
