@@ -18,5 +18,5 @@ class Armor:
         text = f'{self.portrayal}\nType: {self.type}\nAdditional health defence: {self.defense}\nAdditional mana defence: {self.mana_defense}'
         for stat, coefficients in self.modifiers.items():
             stat_str = stat.replace('_', ' ')
-            text += f'\nModifies {stat_str}: {player.__getattribute__(stat)} -> {np.polyval(coefficients, player.__getattribute__(stat))}'
+            text += f'\nModifies {stat_str}: {player.__getattribute__(f"unmodified_{stat}")} -> {np.polyval(coefficients, player.__getattribute__(f"unmodified_{stat}"))}'
         return text

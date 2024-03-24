@@ -40,14 +40,18 @@ class GameWorld:
             print("No reason to flee you coward!!!")
 
     def attack_enemy(self):
-        damage = int(self.player.strike_damage() * uniform(0.7, 1.3))
-        mana_damage = int(self.player.get_mana_damage() * uniform(0.7, 1.3))
+        damage_variance_low = max(1 - self.settings.damage_defence_variance, 0)
+        damage_variance_high = 1 + self.settings.damage_defence_variance
+
+        damage = int(self.player.strike_damage() * uniform(damage_variance_low, damage_variance_high))
+        mana_damage = int(self.player.get_mana_damage() * uniform(damage_variance_low, damage_variance_high))
         enemy_health = max(self.current_enemy.get_health() - damage, 0)
         enemy_mana = max(self.current_enemy.get_mana() - mana_damage, 0)
 
         self.current_enemy.set_health(enemy_health)
         self.current_enemy.set_mana(enemy_mana)
 
+        print(f"You dealt {damage} damage. {self.current_enemy.name} has {self.current_enemy.get_health()} health.")
         if self.player.weapon is not None:
             self.player.mana -= self.player.weapon.mana_cost
             self.player.health -= self.player.weapon.health_cost
@@ -55,7 +59,7 @@ class GameWorld:
                 print(f"You have {self.player.mana} mana left")
             if self.player.weapon.health_cost > 0:
                 print(f"You have {self.player.health} health left")
-        print(f"You dealt {damage} damage. Enemy has {self.current_enemy.get_health()} health.")
+
         if enemy_health == 0:
             print(f"You beat {self.current_enemy.name}!")
             self.current_enemy.set_position_none()
@@ -72,29 +76,36 @@ class GameWorld:
 
     def attack_player(self):
         chosen_attack = self.current_enemy.choose_attack()
-        damage_variance_low = 1 - chosen_attack['health_damage_variance']
+        damage_variance_low = max(1 - chosen_attack['health_damage_variance'], 0)
         damage_variance_high = 1 + chosen_attack['health_damage_variance']
         damage = int(chosen_attack['health_damage'] * uniform(damage_variance_low, damage_variance_high))
 
-        mana_damage_variance_low = 1 - chosen_attack['mana_damage_variance']
+        mana_damage_variance_low = max(1 - chosen_attack['mana_damage_variance'], 0)
         mana_damage_variance_high = 1 + chosen_attack['mana_damage_variance']
         mana_damage = int(chosen_attack['mana_damage'] * uniform(mana_damage_variance_low, mana_damage_variance_high))
 
-        defense = int(self.player.get_defense() * uniform(0.7, 1.3))
-        mana_defence = int(self.player.get_mana_defense() * uniform(0.7, 1.3))
+        defence_variance_low = max(1 - self.settings.damage_defence_variance, 0)
+        defence_variance_high = 1 + self.settings.damage_defence_variance
+        defense = int(self.player.get_defense() * uniform(defence_variance_low, defence_variance_high))
+        mana_defence = int(self.player.get_mana_defense() * uniform(defence_variance_low, defence_variance_high))
 
         player_health = max(self.player.get_health() - max(damage - defense, 0), 0)
         player_mana = max(self.player.get_mana() - max(mana_damage - mana_defence, 0), 0)
 
         self.player.set_health(player_health)
         self.player.set_mana(player_mana)
-        text = f"{self.current_enemy.name}'s turn.\n{self.current_enemy.name} dealt {damage} damage. You have {self.player.get_health()} health."
-        # TODO: print player mana stats
+        text = (f"{self.current_enemy.name}'s turn.\n"
+                f"{self.current_enemy.name} attacked you with {chosen_attack['name'].replace('_', ' ')} and dealt {damage} damage. "
+                f"You have {self.player.get_health()} health.")
+
         self.current_enemy.reduce_health(chosen_attack["health_cost"])
         self.current_enemy.reduce_mana(chosen_attack["mana_cost"])
-        # TODO: print enemy stats
         if player_health == 0:
             text += "\nYou died"
+            if self.player.weapon is not None:
+                self.player.remove_stat_modifications(self.player.weapon)
+            if self.player.armor is not None:
+                self.player.remove_stat_modifications(self.player.armor)
             dropped_items_text = self.player.drop_items_after_death(self)
             text_val, _ = self.player.move_to_start_position(self)
             text += f"\n{text_val}"
@@ -105,8 +116,8 @@ class GameWorld:
 
     def heal_enemy(self):
         if self.current_enemy is not None and uniform(0, 1) < self.current_enemy.healing_chance:
-            healing_variance_low = 1 - self.current_enemy.healing_amount_variance
+            healing_variance_low = max(1 - self.current_enemy.healing_amount_variance, 0)
             healing_variance_high = 1 + self.current_enemy.healing_amount_variance
             amount = int(self.current_enemy.healing_amount * uniform(healing_variance_low, healing_variance_high))
             self.current_enemy.heal(amount)
-            print(f"Enemy healed by {amount}. Enemy has {self.current_enemy.get_health()} health.")
+            print(f"{self.current_enemy.name} healed by {amount}. Enemy has {self.current_enemy.get_health()} health.")

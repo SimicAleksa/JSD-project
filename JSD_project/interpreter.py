@@ -127,7 +127,12 @@ def parse_dsl():
 
     # Set settings
     for settings_def in model.settings:
-        settings = GeneralSettings(settings_def.dropOtherWeapons, settings_def.dropOtherArmors, settings_def.additionalTurnAfterUse)
+        settings = GeneralSettings(
+            settings_def.dropOtherWeapons,
+            settings_def.dropOtherArmors,
+            settings_def.additionalTurnAfterUse,
+            settings_def.damageDefenceVariance
+        )
         game_world.settings = settings
 
     return game_world

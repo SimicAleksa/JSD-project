@@ -23,5 +23,5 @@ class Weapon:
             text += f'\nReduces mana by {self.mana_cost} when used.'
         for stat, coefficients in self.modifiers.items():
             stat_str = stat.replace('_', ' ')
-            text += f'\nModifies {stat_str}: {player.__getattribute__(stat)} -> {np.polyval(coefficients, player.__getattribute__(stat))}'
+            text += f'\nModifies {stat_str}: {player.__getattribute__(f"unmodified_{stat}")} -> {np.polyval(coefficients, player.__getattribute__(f"unmodified_{stat}"))}'
         return text

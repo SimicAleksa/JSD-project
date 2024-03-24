@@ -328,6 +328,11 @@ class Player:
             original_value = getattr(self, f'unmodified_{property_to_modify}')
             setattr(self, property_to_modify, original_value)
 
+            if property_to_modify == 'current_max_health':
+                self.health = min(self.health, self.current_max_health)
+            elif property_to_modify == 'current_max_mana':
+                self.mana = min(self.mana, self.current_max_mana)
+
     def drop(self, item, game_world):
         if (self.weapon is not None and self.weapon.name == item) or (self.armor is not None and self.armor.name == item):
             self.unequip(item, game_world)
@@ -387,7 +392,12 @@ class Player:
                 for action in game_world_item.activations:
                     action.activate(self)
                 self.inventory.remove(item)
-                text = "You used " + item + ". Your health is now " + str(self.health)
+                text = f"You used {item}."
+                if game_world_item.restores_health():
+                    text += f" Your health is now {self.health}."
+                if game_world_item.restores_mana():
+                    text += f" Your mana is now {self.mana}."
+
             if game_world.current_enemy is not None and not game_world.settings.additional_turn_after_use:
                 text += "\n" + game_world.attack_player()
             return text
@@ -399,9 +409,12 @@ class Player:
                 game_world_item = game_world.items[item]
                 if len(game_world_item.contains) > 0:
                     for containItem in game_world_item.contains:
-                        for temp_game_world_item in game_world.items:
-                            if temp_game_world_item == containItem:
-                                self.position.items[temp_game_world_item] = game_world.items[temp_game_world_item]
+                        if containItem in game_world.items:
+                            self.position.items[containItem] = game_world.items[containItem]
+                        elif containItem in game_world.weapons:
+                            self.position.items[containItem] = game_world.weapons[containItem]
+                        elif containItem in game_world.armors:
+                            self.position.items[containItem] = game_world.armors[containItem]
                     self.remove_item(item)
                     return "You opened " + game_world_item.name + ""
                 else:

@@ -44,7 +44,7 @@ region backyard {
 
 item chest {
     portrayal "A wooden chest on the ground."
-    contains twix, mars
+    contains twix, mars, potion, narsil
     isStatic True
 }
 
@@ -57,6 +57,12 @@ item twix {
 item mars {
     portrayal "A mars bar. Caramel and chocolate delightfully restoring health."
     activation heal 700
+    isStatic False
+}
+
+item potion {
+    portrayal "A mysterious sparkly potion. Its smell is hard to resist."
+    activation restoreMana 12
     isStatic False
 }
 
@@ -105,7 +111,7 @@ enemy young_dragon {
         katana,
         shield
     }
-    health 1000
+    health 500
     mana 10
     xp 50
     attacks {
@@ -142,7 +148,7 @@ weapon katana {
         }
         modifier {
             modifies mana_defence
-            coefficients 25
+            coefficients 30
         }
     }
 }
@@ -155,6 +161,20 @@ weapon magic_wand {
     healthDamage 5
 }
 
+weapon narsil {
+    portrayal "One sword to rule them all"
+    type sword
+    healthDamage 15
+    manaDamage 3
+    manaCost 20
+    modifiers {
+        modifier {
+            modifies current_max_mana
+            coefficients 1,5
+        }
+    }
+}
+
 armor shield {
     portrayal "Ugly shield"
     type wood
@@ -165,6 +185,7 @@ armor shield {
 settings {
     dropOtherWeapons True
     additionalTurnAfterUse False
+    damageDefenceVariance 0.3
 }
 
 start_position entryway

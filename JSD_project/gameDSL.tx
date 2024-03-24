@@ -16,6 +16,7 @@ GeneralSettings:
             ('dropOtherWeapons' dropOtherWeapons = BOOL)?
             ('dropOtherArmors' dropOtherArmors = BOOL)?
             'additionalTurnAfterUse' additionalTurnAfterUse = BOOL?
+            ('damageDefenceVariance' damageDefenceVariance = FLOAT)?
         )#
     '}'
 ;

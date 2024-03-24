@@ -3,7 +3,7 @@ import numpy as np
 
 class Enemy:
     def __init__(self, name, portrayal, position, health, mana, xp):
-        self.name = name
+        self.name = name.capitalize()
         self.portrayal = portrayal
         self.position = position
         self.health = health
